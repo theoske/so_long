@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/20 16:31:42 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/20 16:59:29 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,31 +49,40 @@ int key_hook(int keycode, t_vars *vars)
 	return (0);
 }
 
-int main()//utiliser images
+void	initialisation(t_vars *vars)
 {
-	t_vars	vars;
+	vars->mlx = mlx_init();
+	vars->mlx_win = mlx_new_window(vars->mlx, 1280, 720, "so_long");
+	vars->img = mlx_new_image(vars->mlx, 50, 50);
+	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
+}
+
+void	color_img(t_vars *vars, int length, int height, int color)
+{
 	char	*dst;
-	int		i;
-	int		j;
 	int		x;
 	int		y;
 	
-	vars.mlx = mlx_init();
-	vars.mlx_win = mlx_new_window(vars.mlx, 1280, 720, "so_long");
-	vars.img = mlx_new_image(vars.mlx, 50, 50);
-	vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length, &vars.endian);
 	x = 0;
-	while (x <= 50)
+	while (x <= length)
 	{
 		y = 0;
-		while (y <= 50)
+		while (y <= height)
 		{
-			dst = vars.addr + (y * vars.line_length + x * (vars.bits_per_pixel / 8));
-			*(unsigned int*)dst = 10760863;
+			dst = vars->addr + (y * vars->line_length + x * (vars->bits_per_pixel / 8));
+			*(unsigned int*)dst = color;
 			y++;
 		}
 		x++;
 	}
+}
+
+int main()//utiliser images
+{
+	t_vars	vars;	
+	
+	initialisation(&vars);
+	color_img(&vars, 50, 50, 10760863);
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
