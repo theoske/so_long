@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/20 15:06:31 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/20 15:59:55 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,12 @@ int key_hook(int keycode, t_vars *vars)
 	else if (keycode == 0)
 		x -= 100;
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+	if (keycode == 53)
+	{
+		mlx_destroy_image(vars->mlx, vars->img);
+		mlx_destroy_window(vars->mlx, vars->mlx_win);
+		return (-1);
+	}
 	return (0);
 }
 
@@ -68,7 +74,8 @@ int main()//utiliser images
 		}
 		x++;
 	}
-	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
+	if (mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars) == -1)
+		exit(EXIT_SUCCESS);
 	mlx_loop(vars.mlx);
 	return (0);
 }
