@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/20 16:59:29 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/21 17:44:33 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	initialisation(t_vars *vars)
 {
 	vars->mlx = mlx_init();
 	vars->mlx_win = mlx_new_window(vars->mlx, 1280, 720, "so_long");
-	vars->img = mlx_new_image(vars->mlx, 50, 50);
+	vars->img = mlx_new_image(vars->mlx, 100, 100);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
@@ -77,13 +77,73 @@ void	color_img(t_vars *vars, int length, int height, int color)
 	}
 }
 
-int main()//utiliser images
+void	put_ground(int x, int y, t_vars *vars)
+{
+	int		height;
+	int		width;
+	static int	spritenbr = 1;
+
+	height = 100;
+	width = 100;
+	if (spritenbr == 1)
+	{
+		vars->img = mlx_xpm_file_to_image(vars->mlx, "whiteWater/whiteWater1.xpm", &width, &height);
+		spritenbr++;
+	}
+	else if (spritenbr == 2)
+	{
+		vars->img = mlx_xpm_file_to_image(vars->mlx, "whiteWater/whiteWater3.xpm", &width, &height);
+		spritenbr++;
+	}
+	else if (spritenbr == 3)
+	{
+		vars->img = mlx_xpm_file_to_image(vars->mlx, "whiteWater/whiteWater4.xpm", &width, &height);
+		spritenbr = 1;
+	}
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+}
+
+void	ft_parser(char *tab, t_vars *vars)
+{
+	int		i;
+	int		x;
+	int		y;
+	
+	i = 0;
+	x = 0;
+	y = 0;
+	while (tab[i])
+	{
+		if (tab[i] == '0')
+			put_ground(x, y, vars);
+		// else if (tab[i] == 1)
+		// 	put_wall(x, y, vars);
+		// else if (tab[i] == 'C')
+		// 	put_item(x, y, vars);
+		// else if (tab[i] == 'E')
+		// 	put_exit(x, y, vars);
+		// else if (tab[i] == 'P')
+		// 	put_spawn(x, y, vars);
+		// else if (tab[i] == '\n')
+		// {
+		// 	x = 0;
+		// 	y += 99;
+		// }
+		x += 99;
+		i++;
+	}
+}
+
+int main(int argc, char *argv[])//utiliser images
 {
 	t_vars	vars;	
 	
+	if (argc != 2)
+		return (0);
 	initialisation(&vars);
-	color_img(&vars, 50, 50, 10760863);
-	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
+	ft_parser(argv[1], &vars);
+	// color_img(&vars, 50, 50, 10760863);
+	// mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
 }
