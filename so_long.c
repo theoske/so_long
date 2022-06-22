@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/22 16:20:13 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/22 17:26:53 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,66 +200,123 @@ int	charchecker(char c)
 		return (-1);
 }
 
-int	contentchecker(char c)
+int	contentchecker(char *map)
 {
-	static int	exit = 0;
-	static int	item = 0;
-	static int	spawn = 0;
+	int		exit;
+	int		item;
+	int		spawn;
+	int		i;
 
-	if (c == 'E')
-		exit++;
-	else if (c == 'C')
-		item++;
-	else if (c == 'P')
-		spawn++;
+	exit = 0;
+	item = 0;
+	spawn = 0;
+	i = 0;
+	while (map[i])
+	{
+		if (map[i] == 'E')
+			exit++;
+		else if (map[i] == 'C')
+			item++;
+		else if (map[i] == 'P')
+			spawn++;
+	}
 	if (spawn > 0 && exit > 0 && item > 0)
 		return (0);
 	else
 		return (-1);
 }
 
-int	mapchecker(char *mapname)//remplacer par utilisation gnl
+int	startwallchecker(char *line)
 {
-	int		fd;
-	int		octet;
-	char	buff[2];
-	int		rect[2];
-	char	*map;
+	int		i;
 
-	fd = open(mapname, O_RDONLY);
-	if (fd == -1)
-		perror("erreur ouverture map");
-	octet = 1;
-	rect[0] = 0;
-	rect[1] = 0;
-	while (octet == 1)
+	i = 0;
+	while (line[i])
 	{
-		
-		octet = read(fd, buff, 1);
-		buff[1] = 0;
-		if (charchecker(buff[0]) == -1)
-		{
-			close(fd);
+		if (line[i] != '1')
 			return (-1);
-		}
-		if (buff[0] != '\n')
-			rect[0]++;
-		else
-		{
-			if (rect[1] != rect[0] && rect[1] != 0)//si taille ligne i != taille ligne i-1
-				return (-1);
-			rect[1] = rect[0];
-			rect[0] = 0;
-		}
-		contentchecker(buff[0]);
+		i++;
 	}
-	close (fd);
-	if (contentchecker('2') == -1)
-		return (-1);
 	return (0);
 }
 
-int main(int argc, char *argv[])//utiliser images
+int	sidewallchecker(char *line)
+{
+	if (line[0] == '1' && line[ft_strlen(line) - 1] == '1')
+		return (0);
+	else
+		return (-1);
+}
+
+int	endwallchecker(char *map)
+{
+	int		i;
+	int		linecount;
+
+	i = 0;
+	while (map[i])
+	{
+		if (map[i] == '\n')
+			linecount++;
+		i++;
+	}
+	i = 0;
+	while (linecount >= 0)
+	{
+		if (map[i] == '\n')
+			linecount--;
+		i++;
+	}
+	while (map[i])
+	{
+		if (map[i] != '1')
+			return (-1);
+	}
+	return (0);
+}
+
+int	mapchecker(char *mapname)//remplacer par utilisation gnl
+{
+	char	*map;
+	char	*line;
+	int		fd;
+	int		i;
+
+	i = 0;
+	fd = open(mapname, O_RDONLY);
+	line = get_next_line(fd);//check mur du haut
+	if (startwallchecker(line) == -1)
+	{
+		free (line);
+		close(fd);
+		return (-1);
+	}
+	map = NULL;
+	map = ft_strjoin(map, line);
+	while (line)
+	{
+		line = get_next_line(fd);
+		if (sidewallchecker(line) == -1)
+		{
+			free (line);
+			free (map);
+			close(fd);
+			return (-1);
+		}
+		map = ft_strjoin(map, line);
+	}
+	if (endwallchecker(map) == -1 || contentchecker(map) == -1)
+	{
+		free (line);
+		free (map);
+		close(fd);
+		return (-1);
+	}
+	close(fd);
+	return (0);
+}
+
+int main(int argc, char *argv[])//tester les checker
 {
 	t_vars	vars;
 	char	*map;
