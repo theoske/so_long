@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/22 17:26:53 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 16:27:36 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,30 +200,27 @@ int	charchecker(char c)
 		return (-1);
 }
 
-int	contentchecker(char *map)
+int	contentchecker(char *line)
 {
-	int		exit;
-	int		item;
-	int		spawn;
+	static int		exit = 0;
+	static int		item = 0;
+	static int		spawn = 0;
 	int		i;
 
-	exit = 0;
-	item = 0;
-	spawn = 0;
 	i = 0;
-	while (map[i])
+	while (line[i])
 	{
-		if (map[i] == 'E')
+		if (line[i] == 'E')
 			exit++;
-		else if (map[i] == 'C')
+		else if (line[i] == 'C')
 			item++;
-		else if (map[i] == 'P')
+		else if (line[i] == 'P')
 			spawn++;
+		i++;
 	}
 	if (spawn > 0 && exit > 0 && item > 0)
 		return (0);
-	else
-		return (-1);
+	return (-1);
 }
 
 int	startwallchecker(char *line)
@@ -233,7 +230,7 @@ int	startwallchecker(char *line)
 	i = 0;
 	while (line[i])
 	{
-		if (line[i] != '1')
+		if (line[i] != '1' && line[i] != '\n')
 			return (-1);
 		i++;
 	}
@@ -242,7 +239,13 @@ int	startwallchecker(char *line)
 
 int	sidewallchecker(char *line)
 {
-	if (line[0] == '1' && line[ft_strlen(line) - 1] == '1')
+	// int i = 0;
+	// while (line[i])
+	// {
+	// 	printf("%c\n", line[i]);
+	// 	i++;
+	// }
+	if (line[0] == '1' && line[ft_strlen(line) - 2] == '1')
 		return (0);
 	else
 		return (-1);
@@ -275,10 +278,10 @@ int	endwallchecker(char *map)
 	return (0);
 }
 
-int	mapchecker(char *mapname)//remplacer par utilisation gnl
+int	mapchecker(char *mapname)//pb de memoire qui rend programme aleatoire
 {
-	char	*map;
 	char	*line;
+	char	*endline;
 	int		fd;
 	int		i;
 
@@ -287,32 +290,33 @@ int	mapchecker(char *mapname)//remplacer par utilisation gnl
 	line = get_next_line(fd);//check mur du haut
 	if (startwallchecker(line) == -1)
 	{
+		printf("startwall\n");
 		free (line);
 		close(fd);
 		return (-1);
 	}
-	map = NULL;
-	map = ft_strjoin(map, line);
-	while (line)
+	endline = line;
+	while (ft_strlen(line) == ft_strlen(endline))
 	{
+		endline = line;
 		line = get_next_line(fd);
+		contentchecker(line);
 		if (sidewallchecker(line) == -1)
 		{
+			printf("sidewall\n");
 			free (line);
-			free (map);
 			close(fd);
 			return (-1);
 		}
-		map = ft_strjoin(map, line);
+		printf("%s\n", line);
 	}
-	if (endwallchecker(map) == -1 || contentchecker(map) == -1)
+	free (line);
+	close(fd);
+	if (endwallchecker(endline) == -1 || contentchecker(endline) == -1)
 	{
-		free (line);
-		free (map);
-		close(fd);
+		printf("endwall\n");
 		return (-1);
 	}
-	close(fd);
 	return (0);
 }
 
@@ -324,7 +328,12 @@ int main(int argc, char *argv[])//tester les checker
 	if (argc != 2)
 		return (1);
 	if (mapchecker(argv[1]) == -1)
+	{
+		printf("not working\n");
 		return (-1);
+	}
+	else
+		printf("working\n");
 	initialisation(&vars);
 	ft_parser(argv[1], &vars);
 	// color_img(&vars, 50, 50, 10760863);
