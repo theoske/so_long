@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/28 16:27:36 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 14:52:16 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ int	contentchecker(char *line)
 	return (-1);
 }
 
-int	startwallchecker(char *line)
+int	limwallchecker(char *line)
 {
 	int		i;
 
@@ -239,46 +239,13 @@ int	startwallchecker(char *line)
 
 int	sidewallchecker(char *line)
 {
-	// int i = 0;
-	// while (line[i])
-	// {
-	// 	printf("%c\n", line[i]);
-	// 	i++;
-	// }
 	if (line[0] == '1' && line[ft_strlen(line) - 2] == '1')
 		return (0);
 	else
 		return (-1);
 }
 
-int	endwallchecker(char *map)
-{
-	int		i;
-	int		linecount;
-
-	i = 0;
-	while (map[i])
-	{
-		if (map[i] == '\n')
-			linecount++;
-		i++;
-	}
-	i = 0;
-	while (linecount >= 0)
-	{
-		if (map[i] == '\n')
-			linecount--;
-		i++;
-	}
-	while (map[i])
-	{
-		if (map[i] != '1')
-			return (-1);
-	}
-	return (0);
-}
-
-int	mapchecker(char *mapname)//pb de memoire qui rend programme aleatoire
+int	mapchecker(char *mapname)
 {
 	char	*line;
 	char	*endline;
@@ -287,10 +254,9 @@ int	mapchecker(char *mapname)//pb de memoire qui rend programme aleatoire
 
 	i = 0;
 	fd = open(mapname, O_RDONLY);
-	line = get_next_line(fd);//check mur du haut
-	if (startwallchecker(line) == -1)
+	line = get_next_line(fd);
+	if (limwallchecker(line) == -1)
 	{
-		printf("startwall\n");
 		free (line);
 		close(fd);
 		return (-1);
@@ -303,20 +269,20 @@ int	mapchecker(char *mapname)//pb de memoire qui rend programme aleatoire
 		contentchecker(line);
 		if (sidewallchecker(line) == -1)
 		{
-			printf("sidewall\n");
 			free (line);
 			close(fd);
 			return (-1);
 		}
-		printf("%s\n", line);
 	}
-	free (line);
 	close(fd);
-	if (endwallchecker(endline) == -1 || contentchecker(endline) == -1)
+	if (limwallchecker(line) == -1 || contentchecker(endline) == -1)
 	{
-		printf("endwall\n");
+		free (line);
+		free (endline);
 		return (-1);
 	}
+	free (line);
+	free (endline);
 	return (0);
 }
 
@@ -327,7 +293,7 @@ int main(int argc, char *argv[])//tester les checker
 	
 	if (argc != 2)
 		return (1);
-	if (mapchecker(argv[1]) == -1)
+	if (mapchecker(argv[1]) == -1)//v1 works
 	{
 		printf("not working\n");
 		return (-1);
