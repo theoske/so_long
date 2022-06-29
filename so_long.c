@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/29 14:52:16 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 15:30:56 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,17 @@ void	put_ground(int x, int y, t_vars *vars)
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 }
 
+void	put_wall(int x, int y, t_vars *vars)
+{
+	int		height;
+	int		width;
+
+	height = 64;
+	width = 64;
+	vars->img = mlx_xpm_file_to_image(vars->mlx, "wall/wallup.xpm", &width, &height);
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+}
+
 void	ft_parser(char *tab, t_vars *vars)
 {
 	int		i;
@@ -176,19 +187,19 @@ void	ft_parser(char *tab, t_vars *vars)
 	{
 		if (tab[i] == '0')
 			put_ground(x, y, vars);
-		// else if (tab[i] == 1)
-		// 	put_wall(x, y, vars);
+		else if (tab[i] == 1)
+			put_wall(x, y, vars);
 		// else if (tab[i] == 'C')
 		// 	put_item(x, y, vars);
 		// else if (tab[i] == 'E')
 		// 	put_exit(x, y, vars);
 		// else if (tab[i] == 'P')
 		// 	put_spawn(x, y, vars);
-		// else if (tab[i] == '\n')
-		// {
-		// 	x = 0;
-		// 	y += 99;
-		// }
+		else if (tab[i] == '\n')
+		{
+			x = 0;
+			y += 63;
+		}
 		x += 63;
 		i++;
 	}
@@ -286,7 +297,7 @@ int	mapchecker(char *mapname)
 	return (0);
 }
 
-int main(int argc, char *argv[])//tester les checker
+int main(int argc, char *argv[])
 {
 	t_vars	vars;
 	char	*map;
@@ -302,7 +313,7 @@ int main(int argc, char *argv[])//tester les checker
 		printf("working\n");
 	initialisation(&vars);
 	ft_parser(argv[1], &vars);
-	// color_img(&vars, 50, 50, 10760863);
+	color_img(&vars, 64, 64, 10760863);
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
