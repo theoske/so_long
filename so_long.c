@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/29 15:30:56 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 16:19:38 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,17 @@ void	put_wall(int x, int y, t_vars *vars)
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 }
 
+void	put_item(int x, int y, t_vars *vars)
+{
+	int		height;
+	int		width;
+
+	height = 64;
+	width = 64;
+	vars->img = mlx_xpm_file_to_image(vars->mlx, "item/item.xpm", &width, &height);
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+}
+
 void	ft_parser(char *tab, t_vars *vars)
 {
 	int		i;
@@ -189,8 +200,8 @@ void	ft_parser(char *tab, t_vars *vars)
 			put_ground(x, y, vars);
 		else if (tab[i] == 1)
 			put_wall(x, y, vars);
-		// else if (tab[i] == 'C')
-		// 	put_item(x, y, vars);
+		else if (tab[i] == 'C')
+			put_item(x, y, vars);
 		// else if (tab[i] == 'E')
 		// 	put_exit(x, y, vars);
 		// else if (tab[i] == 'P')
