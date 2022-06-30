@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/29 16:19:38 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/06/30 19:44:10 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ int key_hook(int keycode, t_vars *vars)
 		x += 63;
 	else if (keycode == 0)
 		x -= 63;
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+	// mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 	if (keycode == 53)
 	{
 		mlx_destroy_image(vars->mlx, vars->img);
@@ -127,8 +127,8 @@ int key_hook(int keycode, t_vars *vars)
 void	initialisation(t_vars *vars)
 {
 	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, 1280, 720, "so_long");
-	vars->img = mlx_new_image(vars->mlx, 100, 100);
+	vars->mlx_win = mlx_new_window(vars->mlx, 1080, 1080, "so_long");
+	vars->img = mlx_new_image(vars->mlx, 1080, 1080);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
@@ -152,63 +152,51 @@ void	color_img(t_vars *vars, int length, int height, int color)
 	}
 }
 
-void	put_ground(int x, int y, t_vars *vars)
+void	put_sprite(int x, int y, t_vars *vars, char *filename)
 {
 	int		height;
 	int		width;
 
 	height = 64;
 	width = 64;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, "ground/groundflower.xpm", &width, &height);
+	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 }
 
-void	put_wall(int x, int y, t_vars *vars)
+void	ft_parser(const char *arg, t_vars *vars)
 {
-	int		height;
-	int		width;
-
-	height = 64;
-	width = 64;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, "wall/wallup.xpm", &width, &height);
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
-}
-
-void	put_item(int x, int y, t_vars *vars)
-{
-	int		height;
-	int		width;
-
-	height = 64;
-	width = 64;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, "item/item.xpm", &width, &height);
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
-}
-
-void	ft_parser(char *tab, t_vars *vars)
-{
+	char	*tab;
+	char	*join;
 	int		i;
 	int		x;
 	int		y;
 	
+	i = open(arg, O_RDONLY);
+	tab = 0;
+	join = get_next_line(i);
+	while (join)
+	{
+		tab = ft_strjoin(tab, join);
+		join = get_next_line(i);
+	}
 	i = 0;
 	x = 0;
 	y = 0;
 	while (tab[i])
 	{
 		if (tab[i] == '0')
-			put_ground(x, y, vars);
-		else if (tab[i] == 1)
-			put_wall(x, y, vars);
+			put_sprite(x, y, vars, "ground/groundflower.xpm");
+		else if (tab[i] == '1')
+			put_sprite(x, y, vars, "wall/wallup.xpm");
 		else if (tab[i] == 'C')
-			put_item(x, y, vars);
-		// else if (tab[i] == 'E')
-		// 	put_exit(x, y, vars);
-		// else if (tab[i] == 'P')
-		// 	put_spawn(x, y, vars);
+			put_sprite(x, y, vars, "item/item.xpm");
+		else if (tab[i] == 'E')
+			put_sprite(x, y, vars, "exit/exitclose.xpm");
+		else if (tab[i] == 'P')
+			put_sprite(x, y, vars, "ground/groundflower.xpm");
 		else if (tab[i] == '\n')
 		{
-			x = 0;
+			x = -63;
 			y += 63;
 		}
 		x += 63;
@@ -307,7 +295,12 @@ int	mapchecker(char *mapname)
 	free (endline);
 	return (0);
 }
-
+/*
+	finir affichage de la map bien :
+		-faire personnage.
+		-centrer map dans la fenetre.
+		-mettre eau.
+*/
 int main(int argc, char *argv[])
 {
 	t_vars	vars;
@@ -324,7 +317,7 @@ int main(int argc, char *argv[])
 		printf("working\n");
 	initialisation(&vars);
 	ft_parser(argv[1], &vars);
-	color_img(&vars, 64, 64, 10760863);
+	// color_img(&vars, 64, 64, 10760863);
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
