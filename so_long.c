@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/06/30 19:44:10 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/01 16:42:13 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ void	ft_parser(const char *arg, t_vars *vars)
 		else if (tab[i] == 'E')
 			put_sprite(x, y, vars, "exit/exitclose.xpm");
 		else if (tab[i] == 'P')
-			put_sprite(x, y, vars, "ground/groundflower.xpm");
+			put_sprite(x, y, vars, "player/player1.xpm");
 		else if (tab[i] == '\n')
 		{
 			x = -63;
