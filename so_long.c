@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/01 16:42:13 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/01 17:15:42 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,13 @@ typedef struct s_vars
 	int		line_length;
 	int		endian;
 }	t_vars;
+
+typedef struct s_dimension
+{
+	int		x;
+	int		y;
+}	t_dimension;
+
 
 size_t	ft_strlen(const char *s)
 {
@@ -124,11 +131,31 @@ int key_hook(int keycode, t_vars *vars)
 	return (0);
 }
 
-void	initialisation(t_vars *vars)
+void	ft_dimension(char *tab, t_dimension *dimension)
+{
+	int		i;
+
+	i = 0;
+	dimension->x = 0;
+	while (tab[i] != '\n')
+	{
+		dimension->x++;
+		i++;
+	}
+	i = 0;
+	dimension->y = 1;
+	while (tab[i])
+	{
+		if (tab[i] == '\n')
+		dimension->y++;
+	}
+}
+
+void	initialisation(t_vars *vars, t_dimension dimension)
 {
 	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, 1080, 1080, "so_long");
-	vars->img = mlx_new_image(vars->mlx, 1080, 1080);
+	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 64, dimension.y * 64, "so_long");
+	vars->img = mlx_new_image(vars->mlx, dimension.x * 64, dimension.y * 64);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
@@ -297,14 +324,14 @@ int	mapchecker(char *mapname)
 }
 /*
 	finir affichage de la map bien :
-		-faire personnage.
 		-centrer map dans la fenetre.
 		-mettre eau.
 */
 int main(int argc, char *argv[])
 {
-	t_vars	vars;
-	char	*map;
+	t_vars		vars;
+	char		*map;
+	t_dimension	dimension;
 	
 	if (argc != 2)
 		return (1);
@@ -315,7 +342,8 @@ int main(int argc, char *argv[])
 	}
 	else
 		printf("working\n");
-	initialisation(&vars);
+	ft_dimension(argv[1], &dimension);
+	initialisation(&vars, dimension);
 	ft_parser(argv[1], &vars);
 	// color_img(&vars, 64, 64, 10760863);
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
