@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/07 22:19:42 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/07 23:07:23 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,8 +159,8 @@ void	ft_dimension(char *tab, t_dimension *dimension)
 void	initialisation(t_vars *vars, t_dimension dimension)
 {
 	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32, dimension.y * 32, "so_long");
-	vars->img = mlx_new_image(vars->mlx, dimension.x * 32, dimension.y * 32);
+	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
+	vars->img = mlx_new_image(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
@@ -189,10 +189,10 @@ void	put_sprite(int x, int y, t_vars *vars, char *filename)
 	int		height;
 	int		width;
 
-	height = 32;
-	width = 32;
+	height = 31;
+	width = 31;
 	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x * 31, y * 31);
 }
 
 void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
@@ -221,17 +221,17 @@ void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 		else if (tab[i] == '1')
 			put_sprite(x, y, vars, "sprites/wall.xpm");
 		else if (tab[i] == 'C')
-			put_sprite(x, y, vars, "sprites/collectible_gold.xpm");
+			put_sprite(x, y, vars, "sprites/collectible.xpm");
 		else if (tab[i] == 'E')
 			put_sprite(x, y, vars, "sprites/exit_close.xpm");
 		else if (tab[i] == 'P')
 			put_sprite(x, y, vars, "sprites/player.xpm");
 		else if (tab[i] == '\n')
 		{
-			x = -32;
-			y += 32;
+			x = -1;
+			y++;
 		}
-		x += 32;
+		x++;
 		i++;
 	}
 }
