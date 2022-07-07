@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/01 20:18:21 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/07 22:19:42 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,13 +114,13 @@ int key_hook(int keycode, t_vars *vars)
 	static int	y = 0;
 
 	if (keycode == 13)
-		y -= 63;
+		y -= 32;
 	else if (keycode == 1)
-		y += 63;
+		y += 32;
 	else if (keycode == 2)
-		x += 63;
+		x += 32;
 	else if (keycode == 0)
-		x -= 63;
+		x -= 32;
 	// mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 	if (keycode == 53)
 	{
@@ -156,11 +156,11 @@ void	ft_dimension(char *tab, t_dimension *dimension)
 	close (fd);
 }
 
-void	initialisation(t_vars *vars)
+void	initialisation(t_vars *vars, t_dimension dimension)
 {
 	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, 4544, 2048, "so_long");
-	vars->img = mlx_new_image(vars->mlx, 4544, 2048);
+	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32, dimension.y * 32, "so_long");
+	vars->img = mlx_new_image(vars->mlx, dimension.x * 32, dimension.y * 32);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
@@ -189,8 +189,8 @@ void	put_sprite(int x, int y, t_vars *vars, char *filename)
 	int		height;
 	int		width;
 
-	height = 64;
-	width = 64;
+	height = 32;
+	width = 32;
 	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 }
@@ -212,27 +212,26 @@ void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 		join = get_next_line(i);
 	}
 	i = 0;
-	x = dimension.x * 64;
-	y = dimension.y * 64;
-	printf("%d\n\n", dimension.x);
+	x = 0;
+	y = 0;
 	while (tab[i])
 	{
 		if (tab[i] == '0')
-			put_sprite(x , y, vars, "ground/groundflower.xpm");
+			put_sprite(x , y, vars, "sprites/ground.xpm");
 		else if (tab[i] == '1')
-			put_sprite(x, y, vars, "wall/wallup.xpm");
+			put_sprite(x, y, vars, "sprites/wall.xpm");
 		else if (tab[i] == 'C')
-			put_sprite(x, y, vars, "item/item.xpm");
+			put_sprite(x, y, vars, "sprites/collectible_gold.xpm");
 		else if (tab[i] == 'E')
-			put_sprite(x, y, vars, "exit/exitclose.xpm");
+			put_sprite(x, y, vars, "sprites/exit_close.xpm");
 		else if (tab[i] == 'P')
-			put_sprite(x, y, vars, "player/player1.xpm");
+			put_sprite(x, y, vars, "sprites/player.xpm");
 		else if (tab[i] == '\n')
 		{
-			x = (dimension.x * 64) - 64;
-			y += 64;
+			x = -32;
+			y += 32;
 		}
-		x += 64;
+		x += 32;
 		i++;
 	}
 }
@@ -328,11 +327,7 @@ int	mapchecker(char *mapname)
 	free (endline);
 	return (0);
 }
-/*
-	finir affichage de la map bien :
-		-centrer map dans la fenetre.
-		-mettre eau.
-*/
+
 int main(int argc, char *argv[])
 {
 	t_vars		vars;
@@ -349,7 +344,7 @@ int main(int argc, char *argv[])
 	else
 		printf("working\n");
 	ft_dimension(argv[1], &dimension);
-	initialisation(&vars);
+	initialisation(&vars, dimension);
 	ft_parser(argv[1], &vars, dimension);
 	// color_img(&vars, 64, 64, 10760863);
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
