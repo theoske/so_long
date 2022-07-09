@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/09 15:13:16 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/09 15:59:30 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_vars
 	int		endian;
 	int		posx;
 	int		posy;
+	char	*filename;
 }	t_vars;
 
 typedef struct s_dimension
@@ -120,32 +121,90 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
+char	*get_file(const char *filename)
+{
+	int		fd;
+	char	*join;
+	char	*map;
+
+	map = NULL;
+	join = NULL;
+	fd = open(filename, O_RDONLY);
+	join = get_next_line(fd);
+	while (join)
+	{
+		map = ft_strjoin(map, join);
+		join = get_next_line(fd);
+	}
+	close (fd);
+	free (join);
+	return (map);
+}
+
+int	movetester(t_vars *vars, int x_tested, int y_tested)
+{
+	char	*map;
+	int		i;
+
+	i = 0;
+	map = get_file(vars->filename);
+	while (y_tested > 0)
+	{
+		if (map[i] == '\n')
+			y_tested--;
+		i++;
+	}
+	i += x_tested;
+	if (map[i] == '0' || map[i] == 'C' || map[i] == 'P')
+	{
+		free (map);
+		return (0);
+	}
+	else
+	{
+		free (map);
+		return (-1);
+	}
+}
+
 void	moveup(t_vars *vars)
 {
-	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-	vars->posy--;
-	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	if (movetester(vars, vars->posx, vars->posy - 1) == 0)
+	{
+		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+		vars->posy--;
+		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	}
 }
 
 void	movedown(t_vars *vars)
 {
-	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-	vars->posy++;
-	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	if (movetester(vars, vars->posx, vars->posy + 1) == 0)
+	{
+		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+		vars->posy++;
+		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	}
 }
 
 void	moveright(t_vars *vars)
 {
-	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-	vars->posx++;
-	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	if (movetester(vars, vars->posx + 1, vars->posy) == 0)
+	{
+		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+		vars->posx++;
+		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	}
 }
 
 void	moveleft(t_vars *vars)
 {
-	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-	vars->posx--;
-	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	if (movetester(vars, vars->posx - 1, vars->posy) == 0)
+	{
+		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+		vars->posx--;
+		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+	}
 }
 
 int key_hook(int keycode, t_vars *vars)
@@ -230,7 +289,7 @@ void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 	int		y;
 	
 	i = open(arg, O_RDONLY);
-	tab = 0;
+	tab = NULL;
 	join = get_next_line(i);
 	while (join)
 	{
@@ -377,6 +436,7 @@ int main(int argc, char *argv[])
 	initialisation(&vars, dimension);
 	ft_parser(argv[1], &vars, dimension);
 	// color_img(&vars, 64, 64, 10760863);
+	vars.filename = argv[1];
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
