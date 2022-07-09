@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/09 16:07:49 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/09 16:54:27 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,9 +141,52 @@ char	*get_file(const char *filename)
 	return (map);
 }
 
-int	collectible_progress() // compte les C restatns et ouvre porte si besoin
+void	change_exit_to_open(char *map, t_vars *vars)
 {
-	
+	int		i;
+	int		x;
+	int		y;
+
+	i = 0;
+	x = 0;
+	y = 0;
+	while (map[i])
+	{
+		if (map[i] == 'E')
+			put_sprite(x, y, vars, "sprites/exit_open.xpm");
+		x++;
+		if (map[i] == '\n')
+		{
+			x = 0;
+			y++;
+		}
+		i++;
+	}
+}
+
+int	collectible_progress(char *map, t_vars *vars)
+{
+	int			i;
+	static int	collected = 0;
+	int			collectible_nbr;
+
+	i = 0;
+	collectible_nbr = 0;
+	collected++;
+	while (map[i])
+	{
+		if (map[i] == 'C')
+			collectible_nbr++;
+		i++;
+	}
+	if (collectible_nbr == collected)
+	{
+		change_exit_to_open(map, vars);
+		return (0);
+	}
+	else
+		return (-1);
+		
 }
 
 int	movetester(t_vars *vars, int x_tested, int y_tested)
@@ -161,9 +204,9 @@ int	movetester(t_vars *vars, int x_tested, int y_tested)
 		i++;
 	}
 	c = map[i + x_tested];
-	free (map);
 	if (c == 'C')
-		collectible_progress();
+		i = collectible_progress(map, vars);
+	free (map);
 	if (c == '0' || c == 'C' || c == 'P')
 		return (0);
 	else
@@ -212,15 +255,14 @@ void	moveleft(t_vars *vars)
 
 int key_hook(int keycode, t_vars *vars)
 {
-	if (keycode == 13)//up
+	if (keycode == 13)
 		moveup(vars);
-	else if (keycode == 1)//down
+	else if (keycode == 1)
 		movedown(vars);
-	else if (keycode == 2)//right
+	else if (keycode == 2)
 		moveright(vars);
-	else if (keycode == 0)//left
+	else if (keycode == 0)
 		moveleft(vars);
-	// mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 	if (keycode == 53)
 	{
 		mlx_destroy_image(vars->mlx, vars->img);
@@ -261,26 +303,6 @@ void	initialisation(t_vars *vars, t_dimension dimension)
 	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
 	vars->img = mlx_new_image(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
-}
-
-void	color_img(t_vars *vars, int length, int height, int color)
-{
-	char	*dst;
-	int		x;
-	int		y;
-	
-	x = 0;
-	while (x <= length)
-	{
-		y = 0;
-		while (y <= height)
-		{
-			dst = vars->addr + (y * vars->line_length + x * (vars->bits_per_pixel / 8));
-			*(unsigned int*)dst = color;
-			y++;
-		}
-		x++;
-	}
 }
 
 void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
@@ -428,7 +450,7 @@ int main(int argc, char *argv[])
 	
 	if (argc != 2)
 		return (1);
-	if (mapchecker(argv[1]) == -1)//v1 works
+	if (mapchecker(argv[1]) == -1)
 	{
 		printf("not working\n");
 		return (-1);
@@ -438,7 +460,6 @@ int main(int argc, char *argv[])
 	ft_dimension(argv[1], &dimension);
 	initialisation(&vars, dimension);
 	ft_parser(argv[1], &vars, dimension);
-	// color_img(&vars, 64, 64, 10760863);
 	vars.filename = argv[1];
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
