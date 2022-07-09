@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/07 23:07:23 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/09 15:13:16 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ typedef struct s_vars
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
+	int		posx;
+	int		posy;
 }	t_vars;
 
 typedef struct s_dimension
@@ -34,6 +36,16 @@ typedef struct s_dimension
 	int		y;
 }	t_dimension;
 
+void	put_sprite(int x, int y, t_vars *vars, char *filename)
+{
+	int		height;
+	int		width;
+
+	height = 32;
+	width = 32;
+	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x * 31, y * 31);
+}
 
 size_t	ft_strlen(const char *s)
 {
@@ -108,19 +120,44 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
+void	moveup(t_vars *vars)
+{
+	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+	vars->posy--;
+	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+}
+
+void	movedown(t_vars *vars)
+{
+	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+	vars->posy++;
+	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+}
+
+void	moveright(t_vars *vars)
+{
+	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+	vars->posx++;
+	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+}
+
+void	moveleft(t_vars *vars)
+{
+	put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
+	vars->posx--;
+	put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+}
+
 int key_hook(int keycode, t_vars *vars)
 {
-	static int	x = 0;
-	static int	y = 0;
-
-	if (keycode == 13)
-		y -= 32;
-	else if (keycode == 1)
-		y += 32;
-	else if (keycode == 2)
-		x += 32;
-	else if (keycode == 0)
-		x -= 32;
+	if (keycode == 13)//up
+		moveup(vars);
+	else if (keycode == 1)//down
+		movedown(vars);
+	else if (keycode == 2)//right
+		moveright(vars);
+	else if (keycode == 0)//left
+		moveleft(vars);
 	// mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x, y);
 	if (keycode == 53)
 	{
@@ -184,17 +221,6 @@ void	color_img(t_vars *vars, int length, int height, int color)
 	}
 }
 
-void	put_sprite(int x, int y, t_vars *vars, char *filename)
-{
-	int		height;
-	int		width;
-
-	height = 31;
-	width = 31;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x * 31, y * 31);
-}
-
 void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 {
 	char	*tab;
@@ -225,7 +251,11 @@ void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 		else if (tab[i] == 'E')
 			put_sprite(x, y, vars, "sprites/exit_close.xpm");
 		else if (tab[i] == 'P')
+		{
 			put_sprite(x, y, vars, "sprites/player.xpm");
+			vars->posx = x;
+			vars->posy = y;
+		}
 		else if (tab[i] == '\n')
 		{
 			x = -1;
