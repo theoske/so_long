@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/09 15:59:30 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/09 16:07:49 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,9 +141,15 @@ char	*get_file(const char *filename)
 	return (map);
 }
 
+int	collectible_progress() // compte les C restatns et ouvre porte si besoin
+{
+	
+}
+
 int	movetester(t_vars *vars, int x_tested, int y_tested)
 {
 	char	*map;
+	char	c;
 	int		i;
 
 	i = 0;
@@ -154,17 +160,14 @@ int	movetester(t_vars *vars, int x_tested, int y_tested)
 			y_tested--;
 		i++;
 	}
-	i += x_tested;
-	if (map[i] == '0' || map[i] == 'C' || map[i] == 'P')
-	{
-		free (map);
+	c = map[i + x_tested];
+	free (map);
+	if (c == 'C')
+		collectible_progress();
+	if (c == '0' || c == 'C' || c == 'P')
 		return (0);
-	}
 	else
-	{
-		free (map);
 		return (-1);
-	}
 }
 
 void	moveup(t_vars *vars)
