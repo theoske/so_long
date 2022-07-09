@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/09 16:54:27 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/09 18:05:36 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ char	*get_file(const char *filename)
 
 	map = NULL;
 	join = NULL;
-	fd = open(filename, O_RDONLY);
+	fd = open(filename, O_RDWR);
 	join = get_next_line(fd);
 	while (join)
 	{
@@ -139,6 +139,17 @@ char	*get_file(const char *filename)
 	close (fd);
 	free (join);
 	return (map);
+}
+
+// option == 0 to check
+// option == 1 to set to open exit
+int		exitable(int option)
+{
+	static int	exitable = 0;
+	
+	if (option == 1)
+		exitable = 1;
+	return (exitable);
 }
 
 void	change_exit_to_open(char *map, t_vars *vars)
@@ -162,13 +173,14 @@ void	change_exit_to_open(char *map, t_vars *vars)
 		}
 		i++;
 	}
+	exitable(1);
 }
 
 int	collectible_progress(char *map, t_vars *vars)
 {
 	int			i;
-	static int	collected = 0;
 	int			collectible_nbr;
+	static int	collected = 0;
 
 	i = 0;
 	collectible_nbr = 0;
@@ -205,7 +217,7 @@ int	movetester(t_vars *vars, int x_tested, int y_tested)
 	}
 	c = map[i + x_tested];
 	if (c == 'C')
-		i = collectible_progress(map, vars);
+		collectible_progress(map, vars);
 	free (map);
 	if (c == '0' || c == 'C' || c == 'P')
 		return (0);
@@ -308,19 +320,11 @@ void	initialisation(t_vars *vars, t_dimension dimension)
 void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
 {
 	char	*tab;
-	char	*join;
 	int		i;
 	int		x;
 	int		y;
 	
-	i = open(arg, O_RDONLY);
-	tab = NULL;
-	join = get_next_line(i);
-	while (join)
-	{
-		tab = ft_strjoin(tab, join);
-		join = get_next_line(i);
-	}
+	tab = get_file(arg);
 	i = 0;
 	x = 0;
 	y = 0;
@@ -442,6 +446,7 @@ int	mapchecker(char *mapname)
 	return (0);
 }
 
+//changer les open en 1 seul qui transfert la map dans une str a chaque fois et qui modifie la str
 int main(int argc, char *argv[])
 {
 	t_vars		vars;
