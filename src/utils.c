@@ -6,11 +6,11 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 00:08:53 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/11 00:09:10 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/11 00:19:57 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "header/so_long.h"
 
 void	ft_putstr(char *s)
 {

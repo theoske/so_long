@@ -6,11 +6,11 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/10 23:35:09 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/11 00:02:33 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/11 00:20:04 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "header/so_long.h"
 
 /*
 map_parser :
