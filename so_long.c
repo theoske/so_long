@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 17:45:13 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 17:50:45 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -420,17 +420,24 @@ int	contentchecker(char *map)
 	return (0);
 }
 
-// check if the first line is a wall as it should be
-int	limwallchecker(char *line)
+// check if the first and last lines of the map are walls as it should be
+int	limwallchecker(char *map)
 {
 	int		i;
 
 	i = 0;
-	while (line[i] && line[i] != '\n')
+	while (map[i] && map[i] != '\n')
 	{
-		if (line[i] != '1')
+		if (map[i] != '1')
 			return (-1);
 		i++;
+	}
+	i = ft_strlen(map) - 1;
+	while (map[i] && map[i] != '\n')
+	{
+		if (map[i] != '1')
+			return (-1);
+		i--;
 	}
 	return (0);
 }
