@@ -6,38 +6,11 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 23:03:16 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 23:30:17 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <mlx.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-
-typedef struct s_data
-{
-	void	*mlx;
-	void	*mlx_win;
-	void	*img;
-	char	*addr;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-	int		player_position_x;
-	int		player_position_y;
-	char	*map_filename;
-	char	*map;
-}	t_data;
-
-typedef struct s_dimension
-{
-	int		x;
-	int		y;
-}	t_dimension;
+#include "so_long.h"
 
 void	put_sprite(int x, int y, t_data *data, char *sprite_filename)
 {
@@ -682,7 +655,7 @@ int	argument_error(void)
 /*
 so_long :
 - Checks if there is only 1 argument (the map file name).
-- Checks if the map respect the rules of the subject.
+- Checks if the map respect the subject rules.
 - Creates the window with the right size.
 - Puts the sprites on the window according to the map.
 - Handles user input.
