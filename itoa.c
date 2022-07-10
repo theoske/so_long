@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/10 23:55:59 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 23:57:31 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/11 00:10:48 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,3 @@ char	*filling(long int n, char *tab, long int j, long int numbers)
 	}
 	return (tab);
 }
-
