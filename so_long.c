@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 20:03:54 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 20:42:14 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,15 +219,15 @@ int	close_window(t_data *data)
 	return (0);
 }
 
-// option == 0 to check
-// option == 1 to set to open exit
-int	exitable(int option)
+// option == 0 : check exit
+// option == 1 : set exit to open
+int	exit_status(int option)
 {
-	static int	exitable = 0;
+	static int	exit_status = 0;
 
 	if (option == 1)
-		exitable = 1;
-	return (exitable);
+		exit_status = 1;
+	return (exit_status);
 }
 
 void	change_exit_to_open(t_data *data)
@@ -251,7 +251,7 @@ void	change_exit_to_open(t_data *data)
 		}
 		i++;
 	}
-	exitable(1);
+	exit_status(1);
 }
 
 void	collectible_progress(t_data *data)
@@ -270,11 +270,11 @@ void	collectible_progress(t_data *data)
 	if (collectible_nbr == 0)
 	{
 		change_exit_to_open(data);
-		exitable(1);
+		exit_status(1);
 	}
 }
 
-int	movetester(t_data *data, int x_tested, int y_tested)
+int	move_tester(t_data *data, int x_tested, int y_tested)
 {
 	int		i;
 
@@ -293,7 +293,7 @@ int	movetester(t_data *data, int x_tested, int y_tested)
 	}
 	if (data->map[i] == '0' || data->map[i] == 'C' || data->map[i] == 'P')
 		return (0);
-	else if (data->map[i] == 'E' && exitable(0) == 1)
+	else if (data->map[i] == 'E' && exit_status(0) == 1)
 		close_window(data);
 	return (-1);
 }
@@ -310,9 +310,9 @@ void	put_step_nbr(void)
 	free (itoa_result);
 }
 
-void	moveup(t_data *data)
+void	move_up(t_data *data)
 {
-	if (movetester(data, data->player_position_x,
+	if (move_tester(data, data->player_position_x,
 			data->player_position_y - 1) == 0)
 	{
 		put_step_nbr();
@@ -324,9 +324,9 @@ void	moveup(t_data *data)
 	}
 }
 
-void	movedown(t_data *data)
+void	move_down(t_data *data)
 {
-	if (movetester(data, data->player_position_x,
+	if (move_tester(data, data->player_position_x,
 			data->player_position_y + 1) == 0)
 	{
 		put_step_nbr();
@@ -338,9 +338,9 @@ void	movedown(t_data *data)
 	}
 }
 
-void	moveright(t_data *data)
+void	move_right(t_data *data)
 {
-	if (movetester(data, data->player_position_x + 1,
+	if (move_tester(data, data->player_position_x + 1,
 			data->player_position_y) == 0)
 	{
 		put_step_nbr();
@@ -352,9 +352,9 @@ void	moveright(t_data *data)
 	}
 }
 
-void	moveleft(t_data *data)
+void	move_left(t_data *data)
 {
-	if (movetester(data, data->player_position_x - 1,
+	if (move_tester(data, data->player_position_x - 1,
 			data->player_position_y) == 0)
 	{
 		put_step_nbr();
@@ -369,13 +369,13 @@ void	moveleft(t_data *data)
 int	key_hook(int keycode, t_data *data)
 {
 	if (keycode == 13)
-		moveup(data);
+		move_up(data);
 	else if (keycode == 1)
-		movedown(data);
+		move_down(data);
 	else if (keycode == 2)
-		moveright(data);
+		move_right(data);
 	else if (keycode == 0)
-		moveleft(data);
+		move_left(data);
 	if (keycode == 53)
 		close_window(data);
 	return (0);
@@ -458,10 +458,10 @@ void	parser_loop(t_data *data)
 }
 
 /*
-ft_parser :
+map_parser :
 
 */
-void	ft_parser(t_data *data, t_dimension dimension)
+void	map_parser(t_data *data, t_dimension dimension)
 {
 	int		i;
 	int		x;
@@ -531,7 +531,7 @@ int	spawn_on_map(char *map)
 	return (-1);
 }
 
-int	contentchecker(char *map)
+int	content_checker(char *map)
 {
 	if (exit_on_map(map) == -1 || collectible_on_map(map) == -1
 		|| spawn_on_map(map) == -1)
@@ -540,7 +540,7 @@ int	contentchecker(char *map)
 }
 
 // check ifthe first and last lines of the map are walls as it should be
-int	limwallchecker(char *map)
+int	top_bot_walls_checker(char *map)
 {
 	int		i;
 
@@ -562,7 +562,7 @@ int	limwallchecker(char *map)
 }
 
 // check ifeach line of the map is surrounded by a wall
-int	sidewallchecker(char *map)
+int	side_wall_checker(char *map)
 {
 	int		i;
 
@@ -578,7 +578,7 @@ int	sidewallchecker(char *map)
 	return (0);
 }
 
-int	rectanglemapchecker(char *map)
+int	rect_map_checker(char *map)
 {
 	int		i;
 	int		first_line_size;
@@ -606,15 +606,13 @@ int	rectanglemapchecker(char *map)
 	return (0);
 }
 
-int	mapchecker(char *map_filename)
+int	map_checker(char *map_filename)
 {
 	char	*map;
 
 	map = get_file(map_filename);
-	if (!map)
-		return (-1);
-	if (limwallchecker(map) == -1 || contentchecker(map) == -1
-		|| sidewallchecker(map) == -1 || rectanglemapchecker(map) == -1)
+	if (!map || top_bot_walls_checker(map) == -1 || content_checker(map) == -1
+		|| side_wall_checker(map) == -1 || rect_map_checker(map) == -1)
 	{
 		free (map);
 		return (-1);
@@ -634,8 +632,8 @@ int	argument_error(void)
 	ft_putstr("Error\nInvalid number of arguments\n");
 	return (-1);
 }
-//compteur de pas
-// clean code	check leaks
+
+// clean code
 // tout commenter bien
 int	main(int argc, char *argv[])
 {
@@ -644,12 +642,12 @@ int	main(int argc, char *argv[])
 
 	if (argc != 2)
 		return (argument_error());
-	if (mapchecker(argv[1]) == -1)
+	if (map_checker(argv[1]) == -1)
 		return (map_error());
 	data.map_filename = argv[1];
 	set_dimension(data.map_filename, &dimension);
 	initialisation(&data, dimension);
-	ft_parser(&data, dimension);
+	map_parser(&data, dimension);
 	mlx_hook(data.mlx_win, 2, 1L << 0, key_hook, &data);
 	mlx_hook(data.mlx_win, 17, 0, close_window, &data);
 	mlx_loop(data.mlx);
