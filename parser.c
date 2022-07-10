@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/10 23:35:09 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 23:35:53 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/11 00:02:33 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,17 @@ void	parser_loop(t_data *data)
 		x++;
 		i++;
 	}
+}
+
+void	put_sprite(int x, int y, t_data *data, char *sprite_filename)
+{
+	int		height;
+	int		width;
+
+	height = 31;
+	width = 31;
+	data->img = mlx_xpm_file_to_image(data->mlx,
+			sprite_filename, &width, &height);
+	mlx_put_image_to_window(data->mlx, data->mlx_win,
+		data->img, x * 31, y * 31);
 }

@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/10 23:33:04 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 23:36:30 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/11 00:06:02 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,29 @@ void	set_dimension(char *map_filename, t_dimension *dimension)
 	}
 	free (map);
 	close (fd);
+}
+
+/*
+get_file :
+- Puts the entire map from the argument file in the map string with 
+	the get_next_line and ft_strjoin functions.
+*/
+char	*get_file(const char *map_filename)
+{
+	int		fd;
+	char	*join;
+	char	*map;
+
+	map = NULL;
+	join = NULL;
+	fd = open(map_filename, O_RDWR);
+	join = get_next_line(fd);
+	while (join)
+	{
+		map = ft_strjoin(map, join);
+		join = get_next_line(fd);
+	}
+	close (fd);
+	free (join);
+	return (map);
 }
