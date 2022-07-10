@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 19:09:40 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 19:19:38 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -350,13 +350,13 @@ void	ft_parser(t_data *data, t_dimension dimension)
 	int		i;
 	int		x;
 	int		y;
-	
+
 	i = 0;
 	x = 0;
 	y = 0;
 	while (data->map[i])
 	{
-		if (data->map[i] == '0')
+		if (data->map[i] == '0' || data->map[i] == 'P')
 			put_sprite(x , y, data, "sprites/ground.xpm");
 		else if (data->map[i] == '1')
 			put_sprite(x, y, data, "sprites/wall.xpm");
@@ -364,7 +364,20 @@ void	ft_parser(t_data *data, t_dimension dimension)
 			put_sprite(x, y, data, "sprites/collectible.xpm");
 		else if (data->map[i] == 'E')
 			put_sprite(x, y, data, "sprites/exit_close.xpm");
-		else if (data->map[i] == 'P')
+		else if (data->map[i] == '\n')
+		{
+			x = -1;
+			y++;
+		}
+		x++;
+		i++;
+	}
+	i = 0;
+	x = 0;
+	y = 0;
+	while (data->map[i] && data->map[i - 1] != 'P')
+	{
+		if (data->map[i] == 'P')
 		{
 			put_sprite(x, y, data, "sprites/player.xpm");
 			data->player_position_x = x;
@@ -521,8 +534,8 @@ int	map_error(void)
 }
 
 // gerer plusieurs spawn
-//clean code	check leaks
-//tout commenter bien
+// clean code	check leaks
+// tout commenter bien
 int main(int argc, char *argv[])
 {
 	t_data		data;
