@@ -6,7 +6,7 @@
 #    By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/11 00:14:01 by tkempf-e          #+#    #+#              #
-#    Updated: 2022/07/11 00:55:36 by tkempf-e         ###   ########.fr        #
+#    Updated: 2022/07/11 01:01:25 by tkempf-e         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ GCC 	=	gcc
 
 RM		=	rm -f
 
-FLAGS	=	-lmlx -framework OpenGL -framework AppKit
+FLAGS	=	-Wall -Wextra -Werror
 
 NAME	=	so_long
 
@@ -28,6 +28,7 @@ NAME	=	so_long
 	$(GCC) $(FLAGS) -c -I. $< -o ${<:.c=.o}
 
 $(NAME):	$(OBJS)
+					@$(GCC) $(FLAGS) $(OBJS) -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 all:		$(NAME)
 
