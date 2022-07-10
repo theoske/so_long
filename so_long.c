@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 17:50:45 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 18:42:51 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 
 typedef struct s_data
 {
@@ -395,7 +396,7 @@ int	collectible_on_map(char *map)
 	return (-1);
 }
 
-int	spwawn_on_map(char *map)
+int	spawn_on_map(char *map)
 {
 	int		i;
 
@@ -411,11 +412,8 @@ int	spwawn_on_map(char *map)
 
 int	contentchecker(char *map)
 {
-	if (exit_on_map(map) == -1)
-		return (-1);
-	if (collectible_on_map(map) == -1)
-		return (-1);
-	if (spawn_on_map(map) == -1)
+	if (exit_on_map(map) == -1 || collectible_on_map(map) == -1
+		|| spawn_on_map(map) == -1)
 		return (-1);
 	return (0);
 }
@@ -442,54 +440,65 @@ int	limwallchecker(char *map)
 	return (0);
 }
 
-int	sidewallchecker(char *line)
+// check if each line of the map is surrounded by a wall
+int	sidewallchecker(char *map)
 {
-	if (line[0] == '1' && line[ft_strlen(line) - 2] == '1')
-		return (0);
-	else
+	int		i;
+	
+	i = 0;
+	while (map[i + 1])
+	{
+		if (map[i] == '\n' && (map[i - 1] != '1' || map[i + 1] != '1'))
+			return (-1);
+		i++;
+	}
+	if (map[i] != '1')
 		return (-1);
+	return (0);
 }
 
-int	mapchecker(char *mapname)
+int	rectanglemapchecker(char *map)
 {
-	char	*map;
-	int		fd;
 	int		i;
+	int		first_line_size;
+	int		line_size;
 
+	first_line_size = 0;
+	while (map[first_line_size] != '\n')
+		first_line_size++;
+	line_size = 0;
 	i = 0;
-	fd = open(mapname, O_RDONLY);
-	map = get_file(fd);
-	close(fd);
-	if (!map)
-		return (-1);
-	if (limwallchecker(map) == -1)
-	{
-		free (map);
-		return (-1);
-	}
-	if (contentchecker(map) == -1)
-	{
-		free (map);
-		return (-1);
-	}
 	while (map[i])
 	{
-		contentchecker(line);
-		if (sidewallchecker(line) == -1)
+		if (map[i] != '\n')
+			line_size++;
+		else
 		{
-			free (map);
-			return (-1);
+			if (line_size != first_line_size)
+				return (-1);
+			line_size = 0;
 		}
+		i++;
 	}
-	
-	if (limwallchecker(line) == -1 || contentchecker(endline) == -1)
+	if (line_size != first_line_size)
+		return (-1);
+	return (0);
+}
+
+int	mapchecker(char *map_filename)
+{
+	char	*map;
+
+	map = get_file(map_filename);
+	if (!map)
+		return (-1);
+	if (limwallchecker(map) == -1 || contentchecker(map) == -1
+		|| sidewallchecker(map) == -1 || rectanglemapchecker(map) == -1)
 	{
-		free (line);
-		free (endline);
+		free (map);
 		return (-1);
 	}
-	free (line);
-	free (endline);
+	free (map);
 	return (0);
 }
 
