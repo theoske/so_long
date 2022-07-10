@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/09 18:05:36 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 15:12:54 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_vars
 	int		posx;
 	int		posy;
 	char	*filename;
+	char	*map;
 }	t_vars;
 
 typedef struct s_dimension
@@ -152,7 +153,7 @@ int		exitable(int option)
 	return (exitable);
 }
 
-void	change_exit_to_open(char *map, t_vars *vars)
+void	change_exit_to_open(t_vars *vars)
 {
 	int		i;
 	int		x;
@@ -161,12 +162,12 @@ void	change_exit_to_open(char *map, t_vars *vars)
 	i = 0;
 	x = 0;
 	y = 0;
-	while (map[i])
+	while (vars->map[i])
 	{
-		if (map[i] == 'E')
+		if (vars->map[i] == 'E')
 			put_sprite(x, y, vars, "sprites/exit_open.xpm");
 		x++;
-		if (map[i] == '\n')
+		if (vars->map[i] == '\n')
 		{
 			x = 0;
 			y++;
@@ -176,50 +177,44 @@ void	change_exit_to_open(char *map, t_vars *vars)
 	exitable(1);
 }
 
-int	collectible_progress(char *map, t_vars *vars)
+void	collectible_progress(t_vars *vars)
 {
 	int			i;
 	int			collectible_nbr;
-	static int	collected = 0;
 
 	i = 0;
 	collectible_nbr = 0;
-	collected++;
-	while (map[i])
+	while (vars->map[i])
 	{
-		if (map[i] == 'C')
+		if (vars->map[i] == 'C')
 			collectible_nbr++;
 		i++;
 	}
-	if (collectible_nbr == collected)
+	if (collectible_nbr == 0)
 	{
-		change_exit_to_open(map, vars);
-		return (0);
+		change_exit_to_open(vars);
+		exitable(1);
 	}
-	else
-		return (-1);
-		
 }
 
 int	movetester(t_vars *vars, int x_tested, int y_tested)
 {
-	char	*map;
-	char	c;
 	int		i;
 
 	i = 0;
-	map = get_file(vars->filename);
 	while (y_tested > 0)
 	{
-		if (map[i] == '\n')
+		if (vars->map[i] == '\n')
 			y_tested--;
 		i++;
 	}
-	c = map[i + x_tested];
-	if (c == 'C')
-		collectible_progress(map, vars);
-	free (map);
-	if (c == '0' || c == 'C' || c == 'P')
+	i += x_tested;
+	if (vars->map[i] == 'C')
+	{
+		vars->map[i] = '0';
+		collectible_progress(vars);
+	}
+	if (vars->map[i] == '0' || vars->map[i] == 'C' || vars->map[i] == 'P')
 		return (0);
 	else
 		return (-1);
@@ -284,7 +279,7 @@ int key_hook(int keycode, t_vars *vars)
 	return (0);
 }
 
-void	ft_dimension(char *tab, t_dimension *dimension)
+void	set_dimension(char *filename, t_dimension *dimension)
 {
 	int		i;
 	int		fd;
@@ -293,7 +288,7 @@ void	ft_dimension(char *tab, t_dimension *dimension)
 
 	i = 0;
 	dimension->x = 0;
-	fd = open(tab, O_RDONLY);
+	fd = open(filename, O_RDONLY);
 	map = get_next_line(fd);
 	while (map[i] && map[i] != '\n')
 		i++;
@@ -317,34 +312,32 @@ void	initialisation(t_vars *vars, t_dimension dimension)
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
-void	ft_parser(const char *arg, t_vars *vars, t_dimension dimension)
+void	ft_parser(t_vars *vars, t_dimension dimension)
 {
-	char	*tab;
 	int		i;
 	int		x;
 	int		y;
 	
-	tab = get_file(arg);
 	i = 0;
 	x = 0;
 	y = 0;
-	while (tab[i])
+	while (vars->map[i])
 	{
-		if (tab[i] == '0')
+		if (vars->map[i] == '0')
 			put_sprite(x , y, vars, "sprites/ground.xpm");
-		else if (tab[i] == '1')
+		else if (vars->map[i] == '1')
 			put_sprite(x, y, vars, "sprites/wall.xpm");
-		else if (tab[i] == 'C')
+		else if (vars->map[i] == 'C')
 			put_sprite(x, y, vars, "sprites/collectible.xpm");
-		else if (tab[i] == 'E')
+		else if (vars->map[i] == 'E')
 			put_sprite(x, y, vars, "sprites/exit_close.xpm");
-		else if (tab[i] == 'P')
+		else if (vars->map[i] == 'P')
 		{
 			put_sprite(x, y, vars, "sprites/player.xpm");
 			vars->posx = x;
 			vars->posy = y;
 		}
-		else if (tab[i] == '\n')
+		else if (vars->map[i] == '\n')
 		{
 			x = -1;
 			y++;
@@ -446,26 +439,30 @@ int	mapchecker(char *mapname)
 	return (0);
 }
 
+void	set_map(t_vars *vars)
+{
+	int		fd;
+
+	fd = open(vars->filename, O_RDWR);
+	vars->map = get_file(vars->filename);
+	close (fd);
+}
+
 //changer les open en 1 seul qui transfert la map dans une str a chaque fois et qui modifie la str
 int main(int argc, char *argv[])
 {
 	t_vars		vars;
-	char		*map;
 	t_dimension	dimension;
 	
 	if (argc != 2)
-		return (1);
+		return (EXIT_FAILURE);
 	if (mapchecker(argv[1]) == -1)
-	{
-		printf("not working\n");
-		return (-1);
-	}
-	else
-		printf("working\n");
-	ft_dimension(argv[1], &dimension);
-	initialisation(&vars, dimension);
-	ft_parser(argv[1], &vars, dimension);
+		return (EXIT_FAILURE);
 	vars.filename = argv[1];
+	set_map(&vars); // peut le faire dans initialisation
+	set_dimension(vars.filename, &dimension);//clean
+	initialisation(&vars, dimension);//clean
+	ft_parser(&vars, dimension);//clean
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
