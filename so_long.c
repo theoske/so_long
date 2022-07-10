@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 19:40:32 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 20:03:54 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,59 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
+long int	ft_numbers(long int n)
+{
+	long int	numbers;
+
+	numbers = 1;
+	if (n == 0)
+		numbers = 2;
+	if (n < 0)
+		numbers++;
+	while (n != 0)
+	{
+		n /= 10;
+		numbers++;
+	}
+	return (numbers);
+}
+
+char	*filling(long int n, char *tab, long int j, long int numbers)
+{
+	if (n == 0)
+	{
+		tab[j] = 48;
+		tab[j + 1] = '\0';
+		return (tab);
+	}
+	while (n > 0)
+	{
+		numbers = n / 10;
+		tab[j] = n - (numbers * 10) + 48;
+		n /= 10;
+		j--;
+	}
+	return (tab);
+}
+
+char	*ft_itoa(int n)
+{
+	char		*tab;
+	long int	i;
+	long int	j;
+	long int	numbers;
+
+	i = 0;
+	numbers = ft_numbers((long int)n);
+	tab = malloc(sizeof(char) * numbers);
+	if (!tab)
+		return (NULL);
+	j = numbers - 2;
+	tab[numbers - 1] = '\0';
+	tab = filling((long int)n, tab, j, numbers);
+	return (tab);
+}
+
 char	*get_file(const char *map_filename)
 {
 	int		fd;
@@ -245,11 +298,24 @@ int	movetester(t_data *data, int x_tested, int y_tested)
 	return (-1);
 }
 
+void	put_step_nbr(void)
+{
+	static int	step_nbr = 0;
+	char		*itoa_result;
+
+	step_nbr++;
+	itoa_result = ft_itoa(step_nbr);
+	ft_putstr(itoa_result);
+	write(1, "\n", 1);
+	free (itoa_result);
+}
+
 void	moveup(t_data *data)
 {
 	if (movetester(data, data->player_position_x,
 			data->player_position_y - 1) == 0)
 	{
+		put_step_nbr();
 		put_sprite(data->player_position_x,
 			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_y--;
@@ -263,6 +329,7 @@ void	movedown(t_data *data)
 	if (movetester(data, data->player_position_x,
 			data->player_position_y + 1) == 0)
 	{
+		put_step_nbr();
 		put_sprite(data->player_position_x,
 			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_y++;
@@ -276,6 +343,7 @@ void	moveright(t_data *data)
 	if (movetester(data, data->player_position_x + 1,
 			data->player_position_y) == 0)
 	{
+		put_step_nbr();
 		put_sprite(data->player_position_x,
 			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_x++;
@@ -289,6 +357,7 @@ void	moveleft(t_data *data)
 	if (movetester(data, data->player_position_x - 1,
 			data->player_position_y) == 0)
 	{
+		put_step_nbr();
 		put_sprite(data->player_position_x,
 			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_x--;
@@ -565,7 +634,7 @@ int	argument_error(void)
 	ft_putstr("Error\nInvalid number of arguments\n");
 	return (-1);
 }
-
+//compteur de pas
 // clean code	check leaks
 // tout commenter bien
 int	main(int argc, char *argv[])
