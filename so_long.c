@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 18:42:51 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 19:09:40 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,18 @@ size_t	ft_strlen(const char *s)
 	while (s[i])
 		i++;
 	return (i);
+}
+
+void	ft_putstr(char *s)
+{
+	int		i;
+
+	i = 0;
+	while (s[i])
+	{
+		write(1, &s[i], 1);
+		i++;
+	}
 }
 
 char	*ft_strjoin(char *s1, char *s2)
@@ -502,7 +514,13 @@ int	mapchecker(char *map_filename)
 	return (0);
 }
 
-// faire ending
+int	map_error(void)
+{
+	ft_putstr("Error\nInvalid map\n");
+	return (-1);
+}
+
+// gerer plusieurs spawn
 //clean code	check leaks
 //tout commenter bien
 int main(int argc, char *argv[])
@@ -513,7 +531,7 @@ int main(int argc, char *argv[])
 	if (argc != 2)
 		return (EXIT_FAILURE);
 	if (mapchecker(argv[1]) == -1)// a normer
-		return (EXIT_FAILURE);
+		return (map_error());
 	data.map_filename = argv[1];
 	set_dimension(data.map_filename, &dimension);//clean
 	initialisation(&data, dimension);//clean
