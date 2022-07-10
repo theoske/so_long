@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 15:54:01 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 16:54:11 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,6 +260,14 @@ void	moveleft(t_vars *vars)
 	}
 }
 
+int	close_window(t_vars *vars)
+{
+	mlx_destroy_image(vars->mlx, vars->img);
+	mlx_destroy_window(vars->mlx, vars->mlx_win);
+	exit(EXIT_SUCCESS);
+	return (0);
+}
+
 int key_hook(int keycode, t_vars *vars)
 {
 	if (keycode == 13)
@@ -271,11 +279,7 @@ int key_hook(int keycode, t_vars *vars)
 	else if (keycode == 0)
 		moveleft(vars);
 	if (keycode == 53)
-	{
-		mlx_destroy_image(vars->mlx, vars->img);
-		mlx_destroy_window(vars->mlx, vars->mlx_win);
-		exit(EXIT_SUCCESS);
-	}
+		close_window(vars);
 	return (0);
 }
 
@@ -470,6 +474,7 @@ int main(int argc, char *argv[])
 	initialisation(&vars, dimension);//clean
 	ft_parser(&vars, dimension);// a normer
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
+	mlx_hook(vars.mlx_win, 17, 0, close_window, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
 }
