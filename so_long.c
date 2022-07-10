@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 15:12:54 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 15:38:26 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ typedef struct s_vars
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
-	int		posx;
-	int		posy;
+	int		player_position_x;
+	int		player_position_y;
 	char	*filename;
 	char	*map;
 }	t_vars;
@@ -222,41 +222,41 @@ int	movetester(t_vars *vars, int x_tested, int y_tested)
 
 void	moveup(t_vars *vars)
 {
-	if (movetester(vars, vars->posx, vars->posy - 1) == 0)
+	if (movetester(vars, vars->player_position_x, vars->player_position_y - 1) == 0)
 	{
-		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-		vars->posy--;
-		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
+		vars->player_position_y--;
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
 	}
 }
 
 void	movedown(t_vars *vars)
 {
-	if (movetester(vars, vars->posx, vars->posy + 1) == 0)
+	if (movetester(vars, vars->player_position_x, vars->player_position_y + 1) == 0)
 	{
-		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-		vars->posy++;
-		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
+		vars->player_position_y++;
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
 	}
 }
 
 void	moveright(t_vars *vars)
 {
-	if (movetester(vars, vars->posx + 1, vars->posy) == 0)
+	if (movetester(vars, vars->player_position_x + 1, vars->player_position_y) == 0)
 	{
-		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-		vars->posx++;
-		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
+		vars->player_position_x++;
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
 	}
 }
 
 void	moveleft(t_vars *vars)
 {
-	if (movetester(vars, vars->posx - 1, vars->posy) == 0)
+	if (movetester(vars, vars->player_position_x - 1, vars->player_position_y) == 0)
 	{
-		put_sprite(vars->posx, vars->posy, vars, "sprites/ground.xpm");
-		vars->posx--;
-		put_sprite(vars->posx, vars->posy, vars, "sprites/player.xpm");
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
+		vars->player_position_x--;
+		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
 	}
 }
 
@@ -304,14 +304,28 @@ void	set_dimension(char *filename, t_dimension *dimension)
 	close (fd);
 }
 
+/*
+initialisation :
+- transfer the map file to the map string
+- creates the game window with the dimension of the map that we got from the set_dimension function
+*/
 void	initialisation(t_vars *vars, t_dimension dimension)
 {
+	int		fd;
+
+	fd = open(vars->filename, O_RDWR);
+	vars->map = get_file(vars->filename);
+	close (fd);
 	vars->mlx = mlx_init();
 	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
 	vars->img = mlx_new_image(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
 }
 
+/*
+ft_parser :
+- puts the right sprites at the right coordinates according to the map
+*/
 void	ft_parser(t_vars *vars, t_dimension dimension)
 {
 	int		i;
@@ -334,8 +348,8 @@ void	ft_parser(t_vars *vars, t_dimension dimension)
 		else if (vars->map[i] == 'P')
 		{
 			put_sprite(x, y, vars, "sprites/player.xpm");
-			vars->posx = x;
-			vars->posy = y;
+			vars->player_position_x = x;
+			vars->player_position_y = y;
 		}
 		else if (vars->map[i] == '\n')
 		{
@@ -439,16 +453,6 @@ int	mapchecker(char *mapname)
 	return (0);
 }
 
-void	set_map(t_vars *vars)
-{
-	int		fd;
-
-	fd = open(vars->filename, O_RDWR);
-	vars->map = get_file(vars->filename);
-	close (fd);
-}
-
-//changer les open en 1 seul qui transfert la map dans une str a chaque fois et qui modifie la str
 int main(int argc, char *argv[])
 {
 	t_vars		vars;
@@ -459,7 +463,6 @@ int main(int argc, char *argv[])
 	if (mapchecker(argv[1]) == -1)
 		return (EXIT_FAILURE);
 	vars.filename = argv[1];
-	set_map(&vars); // peut le faire dans initialisation
 	set_dimension(vars.filename, &dimension);//clean
 	initialisation(&vars, dimension);//clean
 	ft_parser(&vars, dimension);//clean
