@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 21:38:41 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 22:59:10 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,11 @@ void	ft_putstr(char *s)
 	}
 }
 
+/*
+ft_strjoin :
+- Takes 2 char strings.
+- Joins the 2 strings in a 3rd one and returns it.
+*/
 char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*join;
@@ -113,6 +118,12 @@ char	*ft_line(char *line, char *buffer, int octet, int fd)
 	return (line);
 }
 
+/*
+get_next_line :
+- Takes a file descriptor as an argument and return the
+	first line of the file in a char string.
+- Each call of this function return the next line of the file.
+*/
 char	*get_next_line(int fd)
 {
 	char		buffer[2];
@@ -190,6 +201,11 @@ char	*ft_itoa(int n)
 	return (tab);
 }
 
+/*
+get_file :
+- Puts the entire map from the argument file in the map string with 
+	the get_next_line and ft_strjoin functions.
+*/
 char	*get_file(const char *map_filename)
 {
 	int		fd;
@@ -219,7 +235,7 @@ int	close_window(t_data *data)
 	return (0);
 }
 
-// option == 0 : check exit
+// option == 0 : check exit status
 // option == 1 : set exit to open
 int	exit_status(int option)
 {
@@ -274,6 +290,11 @@ void	collectible_progress(t_data *data)
 	}
 }
 
+/*
+move_tester :
+- Adds the inability to go through walls.
+- Opens exits if all items have been collected.
+*/
 int	move_tester(t_data *data, int x_tested, int y_tested)
 {
 	int		i;
@@ -298,6 +319,11 @@ int	move_tester(t_data *data, int x_tested, int y_tested)
 	return (-1);
 }
 
+/*
+put_step_nbr :
+- Displays the number of steps the player takes in the terminal.
+- Uses the itoa function to convert the number of steps into a printable string of char.
+*/
 void	put_step_nbr(void)
 {
 	static int	step_nbr = 0;
@@ -366,6 +392,11 @@ void	move_left(t_data *data)
 	}
 }
 
+/*
+key_hook :
+- Adds the movement to the character.
+- Adds the ability to close the game by pressing ESC key. 
+*/
 int	key_hook(int keycode, t_data *data)
 {
 	if (keycode == 13)
@@ -381,6 +412,12 @@ int	key_hook(int keycode, t_data *data)
 	return (0);
 }
 
+
+/*
+set_dimension :
+- Finds the height and width of the window and puts
+	them in the dimension structure's values.
+*/
 void	set_dimension(char *map_filename, t_dimension *dimension)
 {
 	int		i;
@@ -411,10 +448,12 @@ initialisation :
 - Creates the game window with the dimension
 	of the map that we got from the set_dimension function.
 */
-void	initialisation(t_data *data, t_dimension dimension)
+void	initialisation(t_data *data)
 {
-	int		fd;
+	int			fd;
+	t_dimension	dimension;
 
+	set_dimension(data->map_filename, &dimension);
 	fd = open(data->map_filename, O_RDWR);
 	data->map = get_file(data->map_filename);
 	close (fd);
@@ -639,19 +678,25 @@ int	argument_error(void)
 	return (-1);
 }
 
-// tout commenter bien
+/*
+so_long :
+- Checks if there is only 1 argument (the map file name).
+- Checks if the map respect the rules of the subject.
+- Creates the window with the right size.
+- Puts the sprites on the window according to the map.
+- Handles user input.
+*/
 int	main(int argc, char *argv[])
 {
 	t_data		data;
-	t_dimension	dimension;
+	
 
 	if (argc != 2)
 		return (argument_error());
 	if (map_checker(argv[1]) == -1)
 		return (map_error());
 	data.map_filename = argv[1];
-	set_dimension(data.map_filename, &dimension);
-	initialisation(&data, dimension);
+	initialisation(&data);
 	map_parser(&data);
 	mlx_hook(data.mlx_win, 2, 1L << 0, key_hook, &data);
 	mlx_hook(data.mlx_win, 17, 0, close_window, &data);
