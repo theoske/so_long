@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 17:25:06 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 17:45:13 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -367,37 +367,68 @@ void	ft_parser(t_data *data, t_dimension dimension)
 	}
 }
 
-int	contentchecker(char *line)
+int	exit_on_map(char *map)
 {
-	static int		exit = 0;
-	static int		item = 0;
-	static int		spawn = 0;
 	int		i;
 
 	i = 0;
-	while (line[i])
+	while (map[i])
 	{
-		if (line[i] == 'E')
-			exit++;
-		else if (line[i] == 'C')
-			item++;
-		else if (line[i] == 'P')
-			spawn++;
+		if (map[i] == 'E')
+			return (0);
 		i++;
 	}
-	if (spawn > 0 && exit > 0 && item > 0)
-		return (0);
 	return (-1);
 }
 
+int	collectible_on_map(char *map)
+{
+	int		i;
+
+	i = 0;
+	while (map[i])
+	{
+		if (map[i] == 'C')
+			return (0);
+		i++;
+	}
+	return (-1);
+}
+
+int	spwawn_on_map(char *map)
+{
+	int		i;
+
+	i = 0;
+	while (map[i])
+	{
+		if (map[i] == 'P')
+			return (0);
+		i++;
+	}
+	return (-1);
+}
+
+int	contentchecker(char *map)
+{
+	if (exit_on_map(map) == -1)
+		return (-1);
+	if (collectible_on_map(map) == -1)
+		return (-1);
+	if (spawn_on_map(map) == -1)
+		return (-1);
+	return (0);
+}
+
+// check if the first line is a wall as it should be
 int	limwallchecker(char *line)
 {
 	int		i;
 
 	i = 0;
-	while (line[i])
+	while (line[i] && line[i] != '\n')
 	{
-		if (line[i] != '1' && line[i] != '\n')
+		if (line[i] != '1')
 			return (-1);
 		i++;
 	}
@@ -414,34 +445,36 @@ int	sidewallchecker(char *line)
 
 int	mapchecker(char *mapname)
 {
-	char	*line;
-	char	*endline;
+	char	*map;
 	int		fd;
 	int		i;
 
 	i = 0;
 	fd = open(mapname, O_RDONLY);
-	line = get_next_line(fd);
-	if (limwallchecker(line) == -1)
+	map = get_file(fd);
+	close(fd);
+	if (!map)
+		return (-1);
+	if (limwallchecker(map) == -1)
 	{
-		free (line);
-		close(fd);
+		free (map);
 		return (-1);
 	}
-	endline = line;
-	while (ft_strlen(line) == ft_strlen(endline))
+	if (contentchecker(map) == -1)
 	{
-		endline = line;
-		line = get_next_line(fd);
+		free (map);
+		return (-1);
+	}
+	while (map[i])
+	{
 		contentchecker(line);
 		if (sidewallchecker(line) == -1)
 		{
-			free (line);
-			close(fd);
+			free (map);
 			return (-1);
 		}
 	}
-	close(fd);
+	
 	if (limwallchecker(line) == -1 || contentchecker(endline) == -1)
 	{
 		free (line);
