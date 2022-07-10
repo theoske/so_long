@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 19:19:38 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 19:27:27 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,11 +341,7 @@ void	initialisation(t_data *data, t_dimension dimension)
 	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel, &data->line_length, &data->endian);
 }
 
-/*
-ft_parser :
-- puts the right sprites at the right coordinates according to the map
-*/
-void	ft_parser(t_data *data, t_dimension dimension)
+void	parser_loop(t_data *data)
 {
 	int		i;
 	int		x;
@@ -372,6 +368,19 @@ void	ft_parser(t_data *data, t_dimension dimension)
 		x++;
 		i++;
 	}
+}
+
+/*
+ft_parser :
+
+*/
+void	ft_parser(t_data *data, t_dimension dimension)
+{
+	int		i;
+	int		x;
+	int		y;
+
+	parser_loop(data);
 	i = 0;
 	x = 0;
 	y = 0;
@@ -533,7 +542,12 @@ int	map_error(void)
 	return (-1);
 }
 
-// gerer plusieurs spawn
+int	argument_error(void)
+{
+	ft_putstr("Error\nInvalid number of arguments\n");
+	return (-1);
+}
+
 // clean code	check leaks
 // tout commenter bien
 int main(int argc, char *argv[])
@@ -542,7 +556,7 @@ int main(int argc, char *argv[])
 	t_dimension	dimension;
 	
 	if (argc != 2)
-		return (EXIT_FAILURE);
+		return (argument_error());
 	if (mapchecker(argv[1]) == -1)// a normer
 		return (map_error());
 	data.map_filename = argv[1];
