@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 17:03:50 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 17:25:06 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-typedef struct s_vars
+typedef struct s_data
 {
 	void	*mlx;
 	void	*mlx_win;
@@ -30,7 +30,7 @@ typedef struct s_vars
 	int		player_position_y;
 	char	*map_filename;
 	char	*map;
-}	t_vars;
+}	t_data;
 
 typedef struct s_dimension
 {
@@ -38,15 +38,15 @@ typedef struct s_dimension
 	int		y;
 }	t_dimension;
 
-void	put_sprite(int x, int y, t_vars *vars, char *sprite_filename)
+void	put_sprite(int x, int y, t_data *data, char *sprite_filename)
 {
 	int		height;
 	int		width;
 
 	height = 31;
 	width = 31;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, sprite_filename, &width, &height);
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x * 31, y * 31);
+	data->img = mlx_xpm_file_to_image(data->mlx, sprite_filename, &width, &height);
+	mlx_put_image_to_window(data->mlx, data->mlx_win, data->img, x * 31, y * 31);
 }
 
 size_t	ft_strlen(const char *s)
@@ -142,10 +142,11 @@ char	*get_file(const char *map_filename)
 	return (map);
 }
 
-int	close_window(t_vars *vars)
+int	close_window(t_data *data)
 {
-	mlx_destroy_image(vars->mlx, vars->img);
-	mlx_destroy_window(vars->mlx, vars->mlx_win);
+	free (data->map);
+	mlx_destroy_image(data->mlx, data->img);
+	mlx_destroy_window(data->mlx, data->mlx_win);
 	exit(EXIT_SUCCESS);
 	return (0);
 }
@@ -161,7 +162,7 @@ int		exitable(int option)
 	return (exitable);
 }
 
-void	change_exit_to_open(t_vars *vars)
+void	change_exit_to_open(t_data *data)
 {
 	int		i;
 	int		x;
@@ -170,12 +171,12 @@ void	change_exit_to_open(t_vars *vars)
 	i = 0;
 	x = 0;
 	y = 0;
-	while (vars->map[i])
+	while (data->map[i])
 	{
-		if (vars->map[i] == 'E')
-			put_sprite(x, y, vars, "sprites/exit_open.xpm");
+		if (data->map[i] == 'E')
+			put_sprite(x, y, data, "sprites/exit_open.xpm");
 		x++;
-		if (vars->map[i] == '\n')
+		if (data->map[i] == '\n')
 		{
 			x = 0;
 			y++;
@@ -185,102 +186,102 @@ void	change_exit_to_open(t_vars *vars)
 	exitable(1);
 }
 
-void	collectible_progress(t_vars *vars)
+void	collectible_progress(t_data *data)
 {
 	int			i;
 	int			collectible_nbr;
 
 	i = 0;
 	collectible_nbr = 0;
-	while (vars->map[i])
+	while (data->map[i])
 	{
-		if (vars->map[i] == 'C')
+		if (data->map[i] == 'C')
 			collectible_nbr++;
 		i++;
 	}
 	if (collectible_nbr == 0)
 	{
-		change_exit_to_open(vars);
+		change_exit_to_open(data);
 		exitable(1);
 	}
 }
 
-int	movetester(t_vars *vars, int x_tested, int y_tested)
+int	movetester(t_data *data, int x_tested, int y_tested)
 {
 	int		i;
 
 	i = 0;
 	while (y_tested > 0)
 	{
-		if (vars->map[i] == '\n')
+		if (data->map[i] == '\n')
 			y_tested--;
 		i++;
 	}
 	i += x_tested;
-	if (vars->map[i] == 'C')
+	if (data->map[i] == 'C')
 	{
-		vars->map[i] = '0';
-		collectible_progress(vars);
+		data->map[i] = '0';
+		collectible_progress(data);
 	}
-	if (vars->map[i] == '0' || vars->map[i] == 'C' || vars->map[i] == 'P')
+	if (data->map[i] == '0' || data->map[i] == 'C' || data->map[i] == 'P')
 		return (0);
-	else if (vars->map[i] == 'E' && exitable(0) == 1)
-		close_window(vars);
+	else if (data->map[i] == 'E' && exitable(0) == 1)
+		close_window(data);
 	return (-1);
 }
 
-void	moveup(t_vars *vars)
+void	moveup(t_data *data)
 {
-	if (movetester(vars, vars->player_position_x, vars->player_position_y - 1) == 0)
+	if (movetester(data, data->player_position_x, data->player_position_y - 1) == 0)
 	{
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
-		vars->player_position_y--;
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		data->player_position_y--;
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
-void	movedown(t_vars *vars)
+void	movedown(t_data *data)
 {
-	if (movetester(vars, vars->player_position_x, vars->player_position_y + 1) == 0)
+	if (movetester(data, data->player_position_x, data->player_position_y + 1) == 0)
 	{
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
-		vars->player_position_y++;
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		data->player_position_y++;
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
-void	moveright(t_vars *vars)
+void	moveright(t_data *data)
 {
-	if (movetester(vars, vars->player_position_x + 1, vars->player_position_y) == 0)
+	if (movetester(data, data->player_position_x + 1, data->player_position_y) == 0)
 	{
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
-		vars->player_position_x++;
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		data->player_position_x++;
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
-void	moveleft(t_vars *vars)
+void	moveleft(t_data *data)
 {
-	if (movetester(vars, vars->player_position_x - 1, vars->player_position_y) == 0)
+	if (movetester(data, data->player_position_x - 1, data->player_position_y) == 0)
 	{
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/ground.xpm");
-		vars->player_position_x--;
-		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		data->player_position_x--;
+		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
-int key_hook(int keycode, t_vars *vars)
+int key_hook(int keycode, t_data *data)
 {
 	if (keycode == 13)
-		moveup(vars);
+		moveup(data);
 	else if (keycode == 1)
-		movedown(vars);
+		movedown(data);
 	else if (keycode == 2)
-		moveright(vars);
+		moveright(data);
 	else if (keycode == 0)
-		moveleft(vars);
+		moveleft(data);
 	if (keycode == 53)
-		close_window(vars);
+		close_window(data);
 	return (0);
 }
 
@@ -314,24 +315,24 @@ initialisation :
 - transfer the map file to the map string
 - creates the game window with the dimension of the map that we got from the set_dimension function
 */
-void	initialisation(t_vars *vars, t_dimension dimension)
+void	initialisation(t_data *data, t_dimension dimension)
 {
 	int		fd;
 
-	fd = open(vars->map_filename, O_RDWR);
-	vars->map = get_file(vars->map_filename);
+	fd = open(data->map_filename, O_RDWR);
+	data->map = get_file(data->map_filename);
 	close (fd);
-	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
-	vars->img = mlx_new_image(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
-	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
+	data->mlx = mlx_init();
+	data->mlx_win = mlx_new_window(data->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
+	data->img = mlx_new_image(data->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
+	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel, &data->line_length, &data->endian);
 }
 
 /*
 ft_parser :
 - puts the right sprites at the right coordinates according to the map
 */
-void	ft_parser(t_vars *vars, t_dimension dimension)
+void	ft_parser(t_data *data, t_dimension dimension)
 {
 	int		i;
 	int		x;
@@ -340,23 +341,23 @@ void	ft_parser(t_vars *vars, t_dimension dimension)
 	i = 0;
 	x = 0;
 	y = 0;
-	while (vars->map[i])
+	while (data->map[i])
 	{
-		if (vars->map[i] == '0')
-			put_sprite(x , y, vars, "sprites/ground.xpm");
-		else if (vars->map[i] == '1')
-			put_sprite(x, y, vars, "sprites/wall.xpm");
-		else if (vars->map[i] == 'C')
-			put_sprite(x, y, vars, "sprites/collectible.xpm");
-		else if (vars->map[i] == 'E')
-			put_sprite(x, y, vars, "sprites/exit_close.xpm");
-		else if (vars->map[i] == 'P')
+		if (data->map[i] == '0')
+			put_sprite(x , y, data, "sprites/ground.xpm");
+		else if (data->map[i] == '1')
+			put_sprite(x, y, data, "sprites/wall.xpm");
+		else if (data->map[i] == 'C')
+			put_sprite(x, y, data, "sprites/collectible.xpm");
+		else if (data->map[i] == 'E')
+			put_sprite(x, y, data, "sprites/exit_close.xpm");
+		else if (data->map[i] == 'P')
 		{
-			put_sprite(x, y, vars, "sprites/player.xpm");
-			vars->player_position_x = x;
-			vars->player_position_y = y;
+			put_sprite(x, y, data, "sprites/player.xpm");
+			data->player_position_x = x;
+			data->player_position_y = y;
 		}
-		else if (vars->map[i] == '\n')
+		else if (data->map[i] == '\n')
 		{
 			x = -1;
 			y++;
@@ -364,12 +365,6 @@ void	ft_parser(t_vars *vars, t_dimension dimension)
 		x++;
 		i++;
 	}
-}
-
-int	charchecker(char c)
-{
-	if (c != '0' && c != '1' && c != 'C' && c != 'E' && c != 'P')
-		return (-1);
 }
 
 int	contentchecker(char *line)
@@ -463,19 +458,19 @@ int	mapchecker(char *mapname)
 //tout commenter bien
 int main(int argc, char *argv[])
 {
-	t_vars		vars;
+	t_data		data;
 	t_dimension	dimension;
 	
 	if (argc != 2)
 		return (EXIT_FAILURE);
 	if (mapchecker(argv[1]) == -1)// a normer
 		return (EXIT_FAILURE);
-	vars.map_filename = argv[1];
-	set_dimension(vars.map_filename, &dimension);//clean
-	initialisation(&vars, dimension);//clean
-	ft_parser(&vars, dimension);// a normer
-	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
-	mlx_hook(vars.mlx_win, 17, 0, close_window, &vars);
-	mlx_loop(vars.mlx);
+	data.map_filename = argv[1];
+	set_dimension(data.map_filename, &dimension);//clean
+	initialisation(&data, dimension);//clean
+	ft_parser(&data, dimension);// a normer
+	mlx_hook(data.mlx_win, 2, 1L<<0, key_hook, &data);
+	mlx_hook(data.mlx_win, 17, 0, close_window, &data);
+	mlx_loop(data.mlx);
 	return (0);
 }
