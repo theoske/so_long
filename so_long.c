@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 19:27:27 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 19:40:32 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,10 @@ void	put_sprite(int x, int y, t_data *data, char *sprite_filename)
 
 	height = 31;
 	width = 31;
-	data->img = mlx_xpm_file_to_image(data->mlx, sprite_filename, &width, &height);
-	mlx_put_image_to_window(data->mlx, data->mlx_win, data->img, x * 31, y * 31);
+	data->img = mlx_xpm_file_to_image(data->mlx,
+			sprite_filename, &width, &height);
+	mlx_put_image_to_window(data->mlx, data->mlx_win,
+		data->img, x * 31, y * 31);
 }
 
 size_t	ft_strlen(const char *s)
@@ -166,10 +168,10 @@ int	close_window(t_data *data)
 
 // option == 0 to check
 // option == 1 to set to open exit
-int		exitable(int option)
+int	exitable(int option)
 {
 	static int	exitable = 0;
-	
+
 	if (option == 1)
 		exitable = 1;
 	return (exitable);
@@ -245,45 +247,57 @@ int	movetester(t_data *data, int x_tested, int y_tested)
 
 void	moveup(t_data *data)
 {
-	if (movetester(data, data->player_position_x, data->player_position_y - 1) == 0)
+	if (movetester(data, data->player_position_x,
+			data->player_position_y - 1) == 0)
 	{
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_y--;
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
 void	movedown(t_data *data)
 {
-	if (movetester(data, data->player_position_x, data->player_position_y + 1) == 0)
+	if (movetester(data, data->player_position_x,
+			data->player_position_y + 1) == 0)
 	{
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_y++;
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
 void	moveright(t_data *data)
 {
-	if (movetester(data, data->player_position_x + 1, data->player_position_y) == 0)
+	if (movetester(data, data->player_position_x + 1,
+			data->player_position_y) == 0)
 	{
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_x++;
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
 void	moveleft(t_data *data)
 {
-	if (movetester(data, data->player_position_x - 1, data->player_position_y) == 0)
+	if (movetester(data, data->player_position_x - 1,
+			data->player_position_y) == 0)
 	{
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/ground.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/ground.xpm");
 		data->player_position_x--;
-		put_sprite(data->player_position_x, data->player_position_y, data, "sprites/player.xpm");
+		put_sprite(data->player_position_x,
+			data->player_position_y, data, "sprites/player.xpm");
 	}
 }
 
-int key_hook(int keycode, t_data *data)
+int	key_hook(int keycode, t_data *data)
 {
 	if (keycode == 13)
 		moveup(data);
@@ -303,7 +317,6 @@ void	set_dimension(char *map_filename, t_dimension *dimension)
 	int		i;
 	int		fd;
 	char	*map;
-
 
 	i = 0;
 	dimension->x = 0;
@@ -326,7 +339,8 @@ void	set_dimension(char *map_filename, t_dimension *dimension)
 /*
 initialisation :
 - transfer the map file to the map string
-- creates the game window with the dimension of the map that we got from the set_dimension function
+- creates the game window with the dimension 
+	of the map that we got from the set_dimension function
 */
 void	initialisation(t_data *data, t_dimension dimension)
 {
@@ -336,9 +350,13 @@ void	initialisation(t_data *data, t_dimension dimension)
 	data->map = get_file(data->map_filename);
 	close (fd);
 	data->mlx = mlx_init();
-	data->mlx_win = mlx_new_window(data->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
-	data->img = mlx_new_image(data->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
-	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel, &data->line_length, &data->endian);
+	data->mlx_win = mlx_new_window(data->mlx,
+			dimension.x * 32 - dimension.x,
+			dimension.y * 32 - dimension.y, "so_long");
+	data->img = mlx_new_image(data->mlx,
+			dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y);
+	data->addr = mlx_get_data_addr(data->img,
+			&data->bits_per_pixel, &data->line_length, &data->endian);
 }
 
 void	parser_loop(t_data *data)
@@ -353,7 +371,7 @@ void	parser_loop(t_data *data)
 	while (data->map[i])
 	{
 		if (data->map[i] == '0' || data->map[i] == 'P')
-			put_sprite(x , y, data, "sprites/ground.xpm");
+			put_sprite(x, y, data, "sprites/ground.xpm");
 		else if (data->map[i] == '1')
 			put_sprite(x, y, data, "sprites/wall.xpm");
 		else if (data->map[i] == 'C')
@@ -452,7 +470,7 @@ int	contentchecker(char *map)
 	return (0);
 }
 
-// check if the first and last lines of the map are walls as it should be
+// check ifthe first and last lines of the map are walls as it should be
 int	limwallchecker(char *map)
 {
 	int		i;
@@ -474,11 +492,11 @@ int	limwallchecker(char *map)
 	return (0);
 }
 
-// check if each line of the map is surrounded by a wall
+// check ifeach line of the map is surrounded by a wall
 int	sidewallchecker(char *map)
 {
 	int		i;
-	
+
 	i = 0;
 	while (map[i + 1])
 	{
@@ -550,20 +568,20 @@ int	argument_error(void)
 
 // clean code	check leaks
 // tout commenter bien
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	t_data		data;
 	t_dimension	dimension;
-	
+
 	if (argc != 2)
 		return (argument_error());
-	if (mapchecker(argv[1]) == -1)// a normer
+	if (mapchecker(argv[1]) == -1)
 		return (map_error());
 	data.map_filename = argv[1];
-	set_dimension(data.map_filename, &dimension);//clean
-	initialisation(&data, dimension);//clean
-	ft_parser(&data, dimension);// a normer
-	mlx_hook(data.mlx_win, 2, 1L<<0, key_hook, &data);
+	set_dimension(data.map_filename, &dimension);
+	initialisation(&data, dimension);
+	ft_parser(&data, dimension);
+	mlx_hook(data.mlx_win, 2, 1L << 0, key_hook, &data);
 	mlx_hook(data.mlx_win, 17, 0, close_window, &data);
 	mlx_loop(data.mlx);
 	return (0);
