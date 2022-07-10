@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 22:59:10 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 23:03:16 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,7 +322,8 @@ int	move_tester(t_data *data, int x_tested, int y_tested)
 /*
 put_step_nbr :
 - Displays the number of steps the player takes in the terminal.
-- Uses the itoa function to convert the number of steps into a printable string of char.
+- Uses the itoa function to convert the number of steps into
+	a printable string of char.
 */
 void	put_step_nbr(void)
 {
@@ -412,7 +413,6 @@ int	key_hook(int keycode, t_data *data)
 	return (0);
 }
 
-
 /*
 set_dimension :
 - Finds the height and width of the window and puts
@@ -498,9 +498,10 @@ void	parser_loop(t_data *data)
 
 /*
 map_parser :
-- With the parser_loop function : parses the map and replaces the spawning sprites by
-	ground sprites to avoid having multiple player sprites on display since the map
-	can contain multiple spawning areas.
+- With the parser_loop function :
+	Parses the map and replaces the spawning sprites by
+	ground sprites to avoid having multiple player sprites
+	on display since the map can contain multiple spawning areas.
 - Sets the player sprite and position on the first spawning area it finds.
 */
 void	map_parser(t_data *data)
@@ -689,7 +690,6 @@ so_long :
 int	main(int argc, char *argv[])
 {
 	t_data		data;
-	
 
 	if (argc != 2)
 		return (argument_error());
