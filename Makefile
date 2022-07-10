@@ -6,19 +6,21 @@
 #    By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/11 00:14:01 by tkempf-e          #+#    #+#              #
-#    Updated: 2022/07/11 00:20:27 by tkempf-e         ###   ########.fr        #
+#    Updated: 2022/07/11 00:55:36 by tkempf-e         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS	=	
+SRCS	=	errors.c get_next_line.c initialisation.c itoa.c key_hook.c main.c \
+			map_checker.c map_content_checker_utils.c moving.c parser.c \
+			utils.c
 
-OBJS	=	$(addsuffix ./src/), $(SRCS:.c=.o)
+OBJS	=	$(join $(addsuffix ./src/, $(dir $(SRCS))), $(notdir $(SRCS:.c=.o)))
 
 GCC 	=	gcc
 
 RM		=	rm -f
 
-FLAGS	=	-Wall -Werror -Wextra -lmlx -framework OpenGL -framework AppKit
+FLAGS	=	-lmlx -framework OpenGL -framework AppKit
 
 NAME	=	so_long
 
