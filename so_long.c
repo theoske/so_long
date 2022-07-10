@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 15:38:26 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 15:54:01 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef struct s_vars
 	int		endian;
 	int		player_position_x;
 	int		player_position_y;
-	char	*filename;
+	char	*map_filename;
 	char	*map;
 }	t_vars;
 
@@ -38,14 +38,14 @@ typedef struct s_dimension
 	int		y;
 }	t_dimension;
 
-void	put_sprite(int x, int y, t_vars *vars, char *filename)
+void	put_sprite(int x, int y, t_vars *vars, char *sprite_filename)
 {
 	int		height;
 	int		width;
 
-	height = 32;
-	width = 32;
-	vars->img = mlx_xpm_file_to_image(vars->mlx, filename, &width, &height);
+	height = 31;
+	width = 31;
+	vars->img = mlx_xpm_file_to_image(vars->mlx, sprite_filename, &width, &height);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img, x * 31, y * 31);
 }
 
@@ -122,7 +122,7 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-char	*get_file(const char *filename)
+char	*get_file(const char *map_filename)
 {
 	int		fd;
 	char	*join;
@@ -130,7 +130,7 @@ char	*get_file(const char *filename)
 
 	map = NULL;
 	join = NULL;
-	fd = open(filename, O_RDWR);
+	fd = open(map_filename, O_RDWR);
 	join = get_next_line(fd);
 	while (join)
 	{
@@ -279,7 +279,7 @@ int key_hook(int keycode, t_vars *vars)
 	return (0);
 }
 
-void	set_dimension(char *filename, t_dimension *dimension)
+void	set_dimension(char *map_filename, t_dimension *dimension)
 {
 	int		i;
 	int		fd;
@@ -288,7 +288,7 @@ void	set_dimension(char *filename, t_dimension *dimension)
 
 	i = 0;
 	dimension->x = 0;
-	fd = open(filename, O_RDONLY);
+	fd = open(map_filename, O_RDONLY);
 	map = get_next_line(fd);
 	while (map[i] && map[i] != '\n')
 		i++;
@@ -313,8 +313,8 @@ void	initialisation(t_vars *vars, t_dimension dimension)
 {
 	int		fd;
 
-	fd = open(vars->filename, O_RDWR);
-	vars->map = get_file(vars->filename);
+	fd = open(vars->map_filename, O_RDWR);
+	vars->map = get_file(vars->map_filename);
 	close (fd);
 	vars->mlx = mlx_init();
 	vars->mlx_win = mlx_new_window(vars->mlx, dimension.x * 32 - dimension.x, dimension.y * 32 - dimension.y, "so_long");
@@ -453,6 +453,9 @@ int	mapchecker(char *mapname)
 	return (0);
 }
 
+// faire ending
+//clean code	check leaks
+//tout commenter bien
 int main(int argc, char *argv[])
 {
 	t_vars		vars;
@@ -460,12 +463,12 @@ int main(int argc, char *argv[])
 	
 	if (argc != 2)
 		return (EXIT_FAILURE);
-	if (mapchecker(argv[1]) == -1)
+	if (mapchecker(argv[1]) == -1)// a normer
 		return (EXIT_FAILURE);
-	vars.filename = argv[1];
-	set_dimension(vars.filename, &dimension);//clean
+	vars.map_filename = argv[1];
+	set_dimension(vars.map_filename, &dimension);//clean
 	initialisation(&vars, dimension);//clean
-	ft_parser(&vars, dimension);//clean
+	ft_parser(&vars, dimension);// a normer
 	mlx_hook(vars.mlx_win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop(vars.mlx);
 	return (0);
