@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 16:54:11 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 17:03:50 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,14 @@ char	*get_file(const char *map_filename)
 	return (map);
 }
 
+int	close_window(t_vars *vars)
+{
+	mlx_destroy_image(vars->mlx, vars->img);
+	mlx_destroy_window(vars->mlx, vars->mlx_win);
+	exit(EXIT_SUCCESS);
+	return (0);
+}
+
 // option == 0 to check
 // option == 1 to set to open exit
 int		exitable(int option)
@@ -216,8 +224,9 @@ int	movetester(t_vars *vars, int x_tested, int y_tested)
 	}
 	if (vars->map[i] == '0' || vars->map[i] == 'C' || vars->map[i] == 'P')
 		return (0);
-	else
-		return (-1);
+	else if (vars->map[i] == 'E' && exitable(0) == 1)
+		close_window(vars);
+	return (-1);
 }
 
 void	moveup(t_vars *vars)
@@ -258,14 +267,6 @@ void	moveleft(t_vars *vars)
 		vars->player_position_x--;
 		put_sprite(vars->player_position_x, vars->player_position_y, vars, "sprites/player.xpm");
 	}
-}
-
-int	close_window(t_vars *vars)
-{
-	mlx_destroy_image(vars->mlx, vars->img);
-	mlx_destroy_window(vars->mlx, vars->mlx_win);
-	exit(EXIT_SUCCESS);
-	return (0);
 }
 
 int key_hook(int keycode, t_vars *vars)
