@@ -6,7 +6,7 @@
 /*   By: tkempf-e <tkempf-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/15 14:53:32 by tkempf-e          #+#    #+#             */
-/*   Updated: 2022/07/10 20:42:14 by tkempf-e         ###   ########.fr       */
+/*   Updated: 2022/07/10 21:38:41 by tkempf-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -407,9 +407,9 @@ void	set_dimension(char *map_filename, t_dimension *dimension)
 
 /*
 initialisation :
-- transfer the map file to the map string
-- creates the game window with the dimension 
-	of the map that we got from the set_dimension function
+- Transfer the map file to the map string.
+- Creates the game window with the dimension
+	of the map that we got from the set_dimension function.
 */
 void	initialisation(t_data *data, t_dimension dimension)
 {
@@ -459,9 +459,12 @@ void	parser_loop(t_data *data)
 
 /*
 map_parser :
-
+- With the parser_loop function : parses the map and replaces the spawning sprites by
+	ground sprites to avoid having multiple player sprites on display since the map
+	can contain multiple spawning areas.
+- Sets the player sprite and position on the first spawning area it finds.
 */
-void	map_parser(t_data *data, t_dimension dimension)
+void	map_parser(t_data *data)
 {
 	int		i;
 	int		x;
@@ -539,7 +542,6 @@ int	content_checker(char *map)
 	return (0);
 }
 
-// check ifthe first and last lines of the map are walls as it should be
 int	top_bot_walls_checker(char *map)
 {
 	int		i;
@@ -561,7 +563,6 @@ int	top_bot_walls_checker(char *map)
 	return (0);
 }
 
-// check ifeach line of the map is surrounded by a wall
 int	side_wall_checker(char *map)
 {
 	int		i;
@@ -573,8 +574,6 @@ int	side_wall_checker(char *map)
 			return (-1);
 		i++;
 	}
-	if (map[i] != '1')
-		return (-1);
 	return (0);
 }
 
@@ -606,6 +605,13 @@ int	rect_map_checker(char *map)
 	return (0);
 }
 
+/*
+map_checker checks if the map follows the following instructions :
+- The map must have at least 1 exit 'E', 1 collectible item 'C'
+	and 1 spawning area for the player 'P'.
+- The map must have a rectangular shape.
+- The map must be surrounded on all sides by walls.
+*/
 int	map_checker(char *map_filename)
 {
 	char	*map;
@@ -633,7 +639,6 @@ int	argument_error(void)
 	return (-1);
 }
 
-// clean code
 // tout commenter bien
 int	main(int argc, char *argv[])
 {
@@ -647,7 +652,7 @@ int	main(int argc, char *argv[])
 	data.map_filename = argv[1];
 	set_dimension(data.map_filename, &dimension);
 	initialisation(&data, dimension);
-	map_parser(&data, dimension);
+	map_parser(&data);
 	mlx_hook(data.mlx_win, 2, 1L << 0, key_hook, &data);
 	mlx_hook(data.mlx_win, 17, 0, close_window, &data);
 	mlx_loop(data.mlx);
